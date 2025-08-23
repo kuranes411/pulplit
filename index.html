@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Interactive Web</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+    }
+
+    body {
+      font-family: monospace;
+    }
+
+    main {
+      width: 100%;
+    }
+
+    section {
+      width: 100vw;
+      min-height: 100vh;
+      position: relative;
+    }
+
+    #intro-section {
+      background-image: url('paper.png');
+      background-size: cover;
+      background-position: center;
+      overflow: hidden;
+    }
+
+    #sketch-section {
+      background-color: rgb(87, 144, 87);
+    }
+
+    #neon-section {
+      background-color: transparent;
+    }
+
+    .highlight-text {
+      position: absolute;
+      background-color: black;
+      color: lightgoldenrodyellow;
+      font-family: monospace;
+      padding: 0.5em 1em;
+      border-radius: 4px;
+      font-weight: normal;
+      z-index: 3;
+      pointer-events: none;
+      mix-blend-mode: multiply;
+      opacity: 0.9;
+    }
+
+    .top-right {
+      top: 100px;
+      right: 200px;
+    }
+
+    .bottom-left {
+      top: 190px;
+      left: 120px;
+    }
+
+    .bottom-right {
+      top: 300px;
+      left: 1150px;
+    }
+
+    video {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      object-fit: contain;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .fade-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgb(255, 255, 255);
+      opacity: 0;
+      transition: opacity 0.8s ease;
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 4;
+      pointer-events: none;
+    }
+
+    .scroll-link {
+      position: absolute;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: white;
+      font-family: monospace;
+      text-decoration: none;
+      z-index: 5;
+      background: rgba(0, 0, 0, 0.4);
+      padding: 0.5em 1em;
+      border-radius: 6px;
+    }
+
+.about-container, .works-container {
+  max-width: 1000px;
+  margin: 4em auto;
+  padding: 2em;
+  position: relative; /* or remove entirely */
+  z-index: 6;
+}
+
+.about-heading {
+  font-size: 3em;
+  font-family: monospace;
+  color: black
+}
+
+.about-paragraph {
+  font-family: monospace;
+  font-size: 1em;
+  line-height: 2.0;
+  color: rgb(0, 0, 0);
+  background: rgba(215, 215, 215, 0.4);
+  padding: 4em;
+  border-radius: 8px;
+}
+
+.works-heading {
+  font-size: 3em;
+  font-family: monospace;
+  color: black;
+  margin-bottom: 0.5em;
+}
+
+.works-paragraph {
+  font-family: monospace;
+  font-size: 1em;
+  line-height: 2.0;
+  color: black;
+  background: rgba(215, 215, 215, 0.4);
+  padding: 1em;
+  border-radius: 8px;
+}
+
+
+.previews-container {
+  max-width: 900px;
+  margin: 3em auto;
+  padding: 2em;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2em;
+  z-index: 5;
+  position: relative;
+}
+
+.preview-card {
+  background: rgba(255,255,255,0.9);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.preview-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+}
+
+.preview-card img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  display: block;
+}
+
+.preview-card a {
+  color: inherit;
+  text-decoration: none;
+  display: block;
+  padding: 1em;
+}
+
+.preview-title {
+  font-size: 1.2em;
+  margin: 0.5em 0;
+  font-family: monospace;
+  color: black;
+}
+
+.preview-description {
+  font-size: 0.9em;
+  color: #333;
+  font-family: monospace;
+}
+
+  </style>
+</head>
+<body>
+  <main>
+    <section id="intro-section">
+      <video autoplay loop muted playsinline>
+        <source src="Desktop0001-0250.webm" type="video/webm">
+        Your browser does not support the video tag.
+      </video>
+
+      <div class="fade-overlay"></div>
+
+      <div class="highlight-text top-right">for the unimaginable!</div>
+      <div class="highlight-text bottom-left">a literary magazine!</div>
+      <div class="highlight-text bottom-right">&amp; impossible to describe!</div>
+
+      <a href="#sketch-section" class="scroll-link">↓ scroll</a>
+     
+    </section>
+
+    <section id="sketch-section">
+    <div class="about-container">
+        <h1 class="about-heading">About</h1>
+        <div class="about-paragraph">
+          <p>PULP is here to bring the best of old pulp magazines into the present, with the aim of reimagining the future.</p>
+          <p>Pulp fiction was instrumental in setting the tones of the classic sci-fi and mystery genres. It set many of the aesthetic and conceptual precedents that rule how we imagine our futures (and the generally strange, bizarre, and distant) today. </p>
+          <p>PULP is here to push those visions further forward. Through cheap and available storytelling, PULP exists to uproot and expand genre conventions — and to reroute the way we think about our futures today. </p>
+          <p>We see the visual style of pulp artwork as a key part of the influence that pulp publications had. As a result, we deeply value the importance of presenting the works that we publish in creative ways that take advantage of their medium and the visual tools of the modern world. We hope you’ll come for the presentation as much as the stories themselves.</p>
+          <p>PULP exists online, but will someday release a physical issue printed on pulp paper. </p>
+          <p>For questions or to submit your work, reach out here: sophiacollender@icloud.com</p>
+          <p>Follow us on Instagram: @pulpmag</p>
+        </div> 
+    </section>
+
+    <section id="neon-section">
+        <div class="works-container">
+            <h1 class="works-heading">Works</h1>
+            <p class="works-paragraph">
+             PULP is dedicated to presenting stories and ideas in ways that do them justice. As such, each piece that PULP publishes is given its own entirely custom page with a unique design that is tailored specifically for its content. The PULP site is hardcoded, allowing for a good deal of flexibility.
+            Flip through our recent publications below! </p>
+          </div>
+
+      <div class="previews-container">
+        <div class="preview-card">
+          <a href="Stories/burn%20after%20reading.html">
+            <img src="images/burn.png" alt="Burn After Reading preview">
+            <h2 class="preview-title">Burn After Reading</h2>
+            <p class="preview-description">D. Lore</p>
+          </a>
+        </div>
+      
+        <div class="preview-card">
+          <a href="Stories/-457.9F.html">
+            <img src="images/ice.png" alt="-457.9 preview">
+            <h2 class="preview-title">-457.9 F</h2>
+            <p class="preview-description">D. Lore</p>
+          </a>
+        </div>
+      
+        <div class="preview-card">
+          <a href="Stories/tree.html">
+            <img src="images/tree.png" alt="Where Should I Put This Tree Preview">
+            <h2 class="preview-title">Where Should I Put This Tree?</h2>
+            <p class="preview-description">D. Lore</p>
+          </a>
+        </div>
+      </div>   
+    </section>   
+  </main>
+
+  <!-- p5.js -->
+  <script src="https://cdn.jsdelivr.net/npm/p5@1.9.0/lib/p5.min.js"></script>
+  <script>
+    let points = [];
+    let strokeR = 0;
+    let strokeG = 0;
+    let strokeB = 0;
+
+    function setup() {
+      createCanvas(windowWidth, windowHeight);
+      noFill();
+      for (let i = 0; i < 150; i++) {
+        points.push(createVector(random(width), random(height)));
+      }
+    }
+
+    function draw() {
+      clear();
+
+      const sketchTop = document.getElementById("sketch-section").getBoundingClientRect().top;
+      const neonTop = document.getElementById("neon-section").getBoundingClientRect().top;
+
+      let rTarget, gTarget, bTarget;
+
+      if (neonTop <= 0) {
+        // Neon green lines
+        rTarget = 87;
+        gTarget = 144;
+        bTarget = 87;
+      } else if (sketchTop <= 0) {
+        // White lines
+        rTarget = 255;
+        gTarget = 255;
+        bTarget = 255;
+      } else {
+        // Black lines
+        rTarget = 0;
+        gTarget = 0;
+        bTarget = 0;
+      }
+
+      // Interpolate color
+      strokeR = lerp(strokeR, rTarget, 0.05);
+      strokeG = lerp(strokeG, gTarget, 0.05);
+      strokeB = lerp(strokeB, bTarget, 0.05);
+
+      stroke(strokeR, strokeG, strokeB, 80);
+      strokeWeight(0.5);
+
+      for (let i = 0; i < points.length; i++) {
+        let p1 = points[i];
+        let dMouse = dist(p1.x, p1.y, mouseX, mouseY);
+        if (dMouse < 150) {
+          let angle = atan2(p1.y - mouseY, p1.x - mouseX);
+          let force = map(dMouse, 0, 150, 1.5, 0);
+          p1.x += cos(angle) * force;
+          p1.y += sin(angle) * force;
+        }
+
+        for (let j = i + 1; j < points.length; j++) {
+          let p2 = points[j];
+          let d = dist(p1.x, p1.y, p2.x, p2.y);
+          if (d < 120) {
+            line(p1.x, p1.y, p2.x, p2.y);
+          }
+        }
+
+        p1.x += sin(frameCount * 0.010 + i) * 0.02;
+        p1.y += cos(frameCount * 0.010 + i) * 0.02;
+
+        if (p1.x < 0) p1.x = width;
+        if (p1.x > width) p1.x = 0;
+        if (p1.y < 0) p1.y = height;
+        if (p1.y > height) p1.y = 0;
+
+        p1.x = constrain(p1.x, 0, width);
+        p1.y = constrain(p1.y, 0, height);
+      }
+    }
+
+    function windowResized() {
+      resizeCanvas(windowWidth, windowHeight);
+    }
+  </script>
+
+  <!-- Lenis -->
+  <script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.26/bundled/lenis.min.js"></script>
+  <script>
+    const lenis = new Lenis({
+      duration: 1.2,
+      easing: t => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      smooth: true
+    });
+
+    function raf(time) {
+      lenis.raf(time);
+      requestAnimationFrame(raf);
+    }
+
+    requestAnimationFrame(raf);
+  </script>
+
+  <!-- Fade overlay scroll logic -->
+  <script>
+    window.addEventListener('scroll', () => {
+      const intro = document.getElementById('intro-section');
+      const overlay = document.querySelector('.fade-overlay');
+      const bottom = intro.getBoundingClientRect().bottom;
+
+      const fadeStart = window.innerHeight * 0.5;
+      const fadeEnd = window.innerHeight * 0.9;
+      const progress = 1 - (bottom - fadeStart) / (fadeEnd - fadeStart);
+      overlay.style.opacity = Math.min(Math.max(progress, 0), 1).toFixed(2);
+    });
+  </script>
+
+</body>
+</html>
+
+

@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Rustling Leaves Poem</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  body {
+    margin:0;
+    background:#fff;
+    font-family: Georgia, serif;
+    color:#222;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    height:100vh;
+    overflow:hidden;
+    position:relative;
+  }
+
+  .poem {
+    max-width: 360px;
+    font-size:1.3em;
+    line-height:1.6;
+    z-index:2;
+    padding:1.2em 1.4em;
+    background:rgba(255,255,255,0.75); /* translucent backdrop for readability */
+    border-radius:10px;
+    text-align:center;
+  }
+
+  svg {
+    position:absolute;
+    top:0; left:0;
+    width:100%; height:100%;
+    z-index:0;
+  }
+
+  .leaf {
+    transform-origin:center;
+    animation: rustle 6s ease-in-out infinite alternate;
+  }
+  .leaf:nth-child(odd) { animation-duration: 5s; }
+  .leaf:nth-child(3n)  { animation-duration: 7s; }
+  .leaf:nth-child(4n)  { animation-duration: 8s; }
+
+  @keyframes rustle {
+    from { transform: rotate(-4deg) translateY(-1px); }
+    to   { transform: rotate(4deg)  translateY(1px); }
+  }
+</style>
+</head>
+<body>
+  <div class="poem">
+    <p><strong>where should i put this tree?</strong></p>
+    <p>The stakes rise each year.<br>
+    Where I plant this tree may save<br>
+    or surrender shade.</p>
+  </div>
+
+  <svg xmlns="http://www.w3.org/2000/svg">
+    <g id="leaves"></g>
+  </svg>
+
+<script>
+(function(){
+  const colors = ["#7ecf7e","#9fdc9f","#66b366","#8ac88a","#74b874"];
+  const leafGroup = document.getElementById("leaves");
+  const rows = 12, cols = 16; // 12x16 = 192 leaves
+  const spacingX = window.innerWidth / cols;
+  const spacingY = window.innerHeight / rows;
+
+  for(let y=0; y<rows; y++){
+    for(let x=0; x<cols; x++){
+      const cx = x * spacingX + Math.random()*spacingX*0.6;
+      const cy = y * spacingY + Math.random()*spacingY*0.6;
+      const rx = 12 + Math.random()*10;
+      const ry = 6 + Math.random()*6;
+      const color = colors[Math.floor(Math.random()*colors.length)];
+
+      const leaf = document.createElementNS("http://www.w3.org/2000/svg","ellipse");
+      leaf.setAttribute("class","leaf");
+      leaf.setAttribute("cx",cx);
+      leaf.setAttribute("cy",cy);
+      leaf.setAttribute("rx",rx);
+      leaf.setAttribute("ry",ry);
+      leaf.setAttribute("fill",color);
+      leafGroup.appendChild(leaf);
+    }
+  }
+})();
+</script>
+</body>
+</html>

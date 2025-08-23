@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Burn After Reading</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
+      background: black;
+    }
+
+    canvas {
+      display: block;
+      cursor: crosshair;
+    }
+
+    .text-overlay {
+      position: absolute;
+      top: 5%;
+      width: 100%;
+      text-align: center;
+      font-family: monospace;
+      color: white;
+      pointer-events: none;
+      padding: 0 5em;
+    }
+
+    h1 {
+      font-size: 2em;
+    }
+
+    h2 {
+      font-size: 0.8em;
+      opacity: 0.6;
+    }
+
+    p {
+      max-width: 700px;
+      margin: 1em auto;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="burnCanvas"></canvas>
+
+  <div class="text-overlay">
+    <h1>Burn After Reading</h1>
+    <h2>D. Lore</h2>
+    <p>Even sound can be captured now. Not even speech can dodge immortality.</p>
+    <p>Words have lost their intimacy.</p>
+    <p>Once there were more perquisites to how they could be exchanged. Sharing them required the presence and attention of others. They were passed between individuals in one another’s presence.</p>
+    <p>They only existed there and then.</p>
+    <p>Those individuals walked away from one another, the only living records of what had passed. Your history was as good as what people remembered of it. Your mistakes and triumphs as good or bad as you thought, and as others thought. </p>
+    <p>Creating history was a collaborative effort, and a changeable one. It was only as good as the people involved.</p>
+    <p>Possibly in the name of truth, we invented writing. Language became a visual experience. Words became things we could see. They had lifespans as long as their mediums, and could be shared between whoever could read them. Thought broke the sound barrier. It could reach wherever. </p>
+    <p>Writing expanded. Mediums became more permanent, and more easily disseminated. Geography shrunk. Translation technology expanded. Words were no longer anything private. </p>
+    <p>Sound became something we could capture. Voices could be preserved, broadcast, and eventually recreated. Speech no longer required presence. Communication as a whole no longer required the human person’s presence.</p>
+    <p>Thoughts became tangible. They became objects. They became distant from their creators. They became detached from their original value entirely — they no longer need convey a perspective. They no longer need to travel from person to person. Words live forever, and can live and die without people.</p>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('burnCanvas');
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+    img.src = 'burnScreen.png';
+
+    // Fullscreen canvas
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      if (img.complete) ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    }
+
+    window.addEventListener('resize', resizeCanvas);
+
+    img.onload = () => {
+      resizeCanvas();
+    };
+
+    canvas.addEventListener('mousemove', (e) => {
+      const x = e.clientX;
+      const y = e.clientY;
+
+      ctx.globalCompositeOperation = 'destination-out'; // erase mode
+      const radius = 30;
+
+      const gradient = ctx.createRadialGradient(x, y, 0, x, y, radius);
+      gradient.addColorStop(0, 'rgba(0,0,0,0.9)');
+      gradient.addColorStop(1, 'rgba(0,0,0,0)');
+
+      ctx.fillStyle = gradient;
+      ctx.beginPath();
+      ctx.arc(x, y, radius, 0, Math.PI * 2, false);
+      ctx.fill();
+      ctx.closePath();
+
+      ctx.globalCompositeOperation = 'source-over'; // reset mode
+    });
+  </script>
+</body>
+</html>
+
+
+
+
