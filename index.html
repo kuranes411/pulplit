@@ -212,13 +212,14 @@
 <body>
   <main>
     <section id="intro-section">
-      <video autoplay loop muted playsinline id="overlayVideo" style="background:transparent; display:block;">
-        <!-- Chrome/Edge use this -->
-        <source src="./Desktop0001-0250.webm" type="video/webm">
-        
-        <!-- Safari will skip the WebM line, and fall back to this -->
-        <source src="./media/overlay.mp4" type="video/mp4">
-      </video>
+      <video id="overlayAlpha" autoplay loop muted playsinline
+       style="background:transparent; display:block; max-width:100%;">
+  <source src="./Desktop0001-0250.webm" type="video/webm">
+</video>
+
+<!-- Fallback element for Safari (animated WebP keeps transparency) -->
+<img id="overlayWebP" src="./safari.webp" alt=""
+     style="display:none; background:transparent; max-width:100%;">
 
       <div class="fade-overlay"></div>
 
@@ -395,7 +396,20 @@
       overlay.style.opacity = Math.min(Math.max(progress, 0), 1).toFixed(2);
     });
   </script>
+<script>
+  // Heuristic: Safari (desktop & iOS) detection
+  const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 
+  if (isSafari) {
+    // Hide video (Safari lacks WebM alpha), show animated WebP
+    const vid = document.getElementById('overlayAlpha');
+    const img = document.getElementById('overlayWebP');
+    if (vid && img) {
+      vid.style.display = 'none';
+      img.style.display = 'block';
+    }
+  }
+</script>
 </body>
 </html>
 
