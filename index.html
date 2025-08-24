@@ -212,9 +212,12 @@
 <body>
   <main>
     <section id="intro-section">
-      <video autoplay loop muted playsinline>
-        <source src="Desktop0001-0250.webm" type="video/webm">
-        Your browser does not support the video tag.
+      <video autoplay loop muted playsinline id="overlayVideo" style="background:transparent; display:block;">
+        <!-- Chrome/Edge use this -->
+        <source src="./media/overlay.webm" type="video/webm">
+        
+        <!-- Safari will skip the WebM line, and fall back to this -->
+        <source src="./media/overlay.mp4" type="video/mp4">
       </video>
 
       <div class="fade-overlay"></div>
@@ -251,7 +254,7 @@
 
       <div class="previews-container">
         <div class="preview-card">
-          <a href="Stories/burn%20after%20reading.html">
+          <a href="Stories/burn-after-reading.html">
             <img src="images/burn.png" alt="Burn After Reading preview">
             <h2 class="preview-title">Burn After Reading</h2>
             <p class="preview-description">D. Lore</p>
