@@ -38,6 +38,16 @@
     #neon-section {
       background-color: transparent;
     }
+    
+    #overlayWebP {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  object-fit: contain;
+  z-index: 1;
+  pointer-events: none;
+  background: transparent;
+}
 
     .highlight-text {
       position: absolute;
@@ -410,6 +420,19 @@
     }
   }
 </script>
+<script>
+  const isIOS = /iP(hone|ad|od)/.test(navigator.platform)
+    || (navigator.userAgent.includes('Mac') && 'ontouchend' in document); // iPad desktop mode
+
+  const vid = document.getElementById('overlayAlpha');
+  const img = document.getElementById('overlayWebP');
+
+  if (isIOS) {
+    if (vid) vid.style.display = 'none';
+    if (img) img.style.display = 'block';
+  }
+</script>
+
 </body>
 </html>
 
