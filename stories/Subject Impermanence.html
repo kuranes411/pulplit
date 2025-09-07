@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Header + Fixed Image</title>
+<style>
+  :root { --header-h: 70px; --x: 50vw; --y: 50vh; --r: 110px; --grain-scale: 60; --grain-contrast: 1.2; }
+
+  html, body { height: 100%; margin: 0; }
+  body { background: #fff; color: #000; font-family: Arial, Helvetica, sans-serif; }
+
+  .header{
+    position: fixed; inset: 0 0 auto 0; height: var(--header-h);
+    background:#fff; border-bottom:1px solid #eee; z-index:10;
+    display:grid; align-content:center; padding:18px clamp(16px,4vw,40px);
+  }
+  .header h1{ margin:0; font-weight:700; font-size:clamp(22px,3.2vw,36px); }
+  .header p { margin:6px 0 0; font-size:clamp(14px,1.8vw,18px); }
+
+  /* Background image as a fixed layer */
+  .bg{
+    position: fixed; inset: var(--header-h) 0 0 0;
+    background: center / cover no-repeat url("IMG_0648.jpeg");
+    z-index:0;
+  }
+
+  /* FOLLOW-CURSOR live static (duplicate image + SVG filter) */
+  .live-static{
+    position: fixed; inset: var(--header-h) 0 0 0;
+    background: center / cover no-repeat url("IMG_0648.jpeg");
+    filter: url(#staticNoise);
+    clip-path: circle(var(--r) at var(--x) var(--y));
+    will-change: clip-path;
+    pointer-events:none;
+    z-index:2;
+  }
+
+  .black-box{
+    position:relative; margin:200px auto 64px; width:min(70ch, calc(100vw - 48px));
+    padding:20px 28px; background:#fff; color:#000; border-radius:15px;
+    box-shadow:0 0 30px rgba(0,0,0,.8); line-height:1.6;
+    font-family:"arial", Arial, Helvetica, sans-serif; font-size:15px; z-index:9;
+  }
+
+  @media (max-width:700px){ :root{ --header-h:96px; } }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <h1>Subject Impermanence</h1>
+  <p>Soramimi Hanarejima</p>
+</header>
+
+<!-- Background image -->
+<div class="bg" aria-hidden="true"></div>
+
+<!-- The noise/static circle that follows the cursor -->
+<div class="live-static" id="live" aria-hidden="true"></div>
+
+<!-- Your content stays the same -->
+<div class="black-box">
+    <p>In the portal station’s departure garden, I wrap my sister’s old self tight around my psyche and snuggle up in the way she used to be: curious, calm, kind, attentive. This softens everything and makes leaving Sastalama easier—less like I’m about to be peeled away from this place that I’ve been so at home in, that I’m not ready to leave—am never ready to leave.</p>
+
+    <p>Sitting half-lotus on the cushion beside mine, Mom takes a deep breath then lets it out slowly. She has always disliked it when I rely on the comfort of familiar things. As soon as I started preschool, she began discouraging me from becoming attached to anything that could serve as a security blanket. I still remember her saying how she’d be so proud of me if I left my tiger plushie at home. Now, she thinks I should have long-since outgrown the need for “transitional objects.” And she especially dislikes it when I become Mari. Mom believes that we shouldn’t cling to the person someone used to be.</p>
+    
+    <p>But she knows that without this soothing memento, I’ll be a mess of longing and irritability. So for now, she’s content to let me be this younger version of my sister.</p>
+    
+    <p>I let my gaze wander the sunlit garden and see it as Mari did, with quiet wonder and sincere appreciation for all the trees and shrubs around us, their leaves aglow with vitality. As Mari, I imagine these plants as absorbing the emotional energy of people leaving Sastalama through this portal station—the vegetation tempering the ambiance by taking in everything from excitement to unease, preventing the air here from becoming too emotionally charged.</p>
+    
+    <p>Before I know it, the technicians have stabilized the portal for our trip, and Mom turns to me, her face noticeably softened by the time we’ve spent in her old hometown—except her eyes, which are fierce as ever.</p>
+    
+    <p>“Time to stop being Mari,” she says. “You have to go back as you.”</p>
+    
+    <p>And because my 14/15-year-old sister was always empathetic and cooperative—ever the good daughter—I remove this old self. Then, the reality of the situation comes crashing in on me. We won’t be back here until winter, at earliest. Five months lie between me and this oasis of quaint neighborhoods with little shops, crisp air pierced by the honks of cranes (never cars), mountain meadows covered in wildflowers and of course the cozy rooms of Granma’s house, each brightened by her lustrous dreamscape paintings—the sheen of their brushstrokes shimmering in even the dimmest light, as though gleaming with meaning hidden in plain sight, answers to questions I have yet to ask.</p>
+    
+    <p>In a few minutes, I’ll be far away from everything that I’ve known for the past two weeks—all that has allowed me to simply be myself, my mind recalling only Mari whenever I thought of my sister. And now, I want to cry. But no tears come, like the time she gave me Mari.</p>
+    
+    <p>2</p>
+    
+    <p>Marigold rose sharply from her desk chair and strode decisively over to the closet. I stayed cross-legged on her bed, but my body snapped to attention, ready to get off the bed and out of her room.</p>
+    
+    <p>“If you like her so much, here, you can have her,” Marigold said, voice pushy and spiny.</p>
+    
+    <p>She pulled out her old self and tossed her at me so she—Mari—landed in my lap, the immediate warmth of her just as I remembered.</p>
+    
+    <p>“Now you won’t ever miss her.”</p>
+    
+    <p>Marigold’s words hurt more than usual because I had hurt her. And I hadn’t meant to, but by saying, “I miss who you used to be,” what else could have happened? I had only wanted to confess my loneliness to her, but she of course—being who she had become—took offense, taking my statement as disapproval, a rejection of her. So she rejected her old self by giving me that person she had been—someone so exuberantly in love with life that she was doomed to have her heart broken by it (at least that’s how I saw things). And now Marigold was breaking my heart.</p>
+    
+    <p>Looking down at Mari, I noticed how worn she had gotten from all the ways she had been in contact with the world. Still, she was beautiful as ever with her charming kindness.</p>
+    
+    <p>My chest ached, bringing me to the brink of crying, but I just continued sitting on the bed like I always did, not sure if I ever would again—my prospects for being here again made doubtful by the sudden clarity that this was no longer the bed I’d settled myself on countless times. With the old floral bedding replaced by plaid sheets and pillowcases, my sister’s bed now sat in the far corner of a room that bore little resemblance to the cozy space it had been when it belonged to Mari.</p>
+    
+    <p>And with her now lying in my lap, the room turned from unfamiliar to unwelcoming, and I could no longer hope for something beyond this reality—that the personality my sister had taken on was now who she believed herself to be. What was there to do now but leave? Leave with Mari, what I wanted but not like this.</p>
+    
+    <p>“Look,” Marigold said, the word stern yet sympathetic. “We all have to change.”</p>
+    
+    <p>Did you have to change this much though? I wanted to ask her. But I didn’t want to make her say something like, No, but this is who I have to be to get to where I want to go. Something that might hurt her more than me.</p>
+    
+    <p>She let me stay on her bed, so I did, even though I didn’t belong there anymore.</p>
+    
+    <p>3</p>
+    
+    <p>It’s only a twenty-one-minute trip (fourteen by train, seven by foot) from the city’s portal station back home, but every minute of it seems to steadily and irreversibly carry me toward both the past and future—what the world was before we left and what the world will be after summer vacation ends—together diminishing the two weeks I’ve been away. Then, we’re there, in front of the boxy, beige house me and Mom have left uninhabited for so much of the summer.</p>
+    
+    <p>Mom unlocks the front door, and I go straight to my room and set my suitcase and backpack on the floor then head to the bathroom to wash up. On the way, I pause in the hallway and peer into my sister’s room. To keep the air inside from getting stale, the door is never closed, and that always tempts me (and sometimes even Mom) to take a look. The room is just the way Marigold left it. A frozen moment waiting for her to breathe time back into it.</p>
+    
+    <p>I think again about how I could turn back time in there, to the way Mari had it. Move the furniture, change the bedsheets, put the trophies in the closet, replace the framed certificates with the old posters of wildlife and abstract art. But this attempt to recreate a pocket of the past would be like asking Mom to get me a therapist. The moment she gets a glimpse of my rearrangements, she’ll diagnose me as having an unhealthy fixation on the past and set up counseling sessions that put me on a sofa in a quiet office where I’m nudged question by question into talking about Mari, to the point that I’m blabbing—soon blubbering—on and on about how much I still need my younger older sister. And if that doesn’t help me “make progress,” Mom might consider putting me in boarding school.</p>
+    
+    <p>On that dramatic note, the daydream trance I’ve slipped into dissolves, and I step away from the doorway.</p>
+    
+    <p>4</p>
+    
+    <p>At the kitchen counter, I prepare a simple salad, and though I’m only cutting lettuce, I make sure to use the knife exactly the way Marigold taught me to.</p>
+    
+    <p>“Don’t push the knife down through a vegetable,” she’d always remind me. “Move the blade forward as you apply pressure to it.”</p>
+    
+    <p>Once, I replied, “But it’s so easy to cut these potatoes by going straight down.”</p>
+    
+    <p>They had been boiled, and we were slicing them into wedges to crisp in the oven.</p>
+    
+    <p>“An action isn’t always about the immediate result,” she said. “It’s important to build the right habits so they’ll be automatic when you need them.”</p>
+    
+    <p>“Good knife technique,” Mom says from across the kitchen, over the crackle of croquettes deep frying. “That firm grip on the back of the blade gives you the best control.”</p>
+    
+    <p>The compliment from Mom makes me smile, and I wonder what habits Marigold is using or building now.</p>
+    
+    <p>5</p>
+    
+    <p>Before going to bed, I listen to Marigold’s dream pop favorites while looking out the window beside my desk. My gaze rests on a moonlit cloud, and I want to become Mari again, to hear these songs the way she would have. But she didn’t listen to this kind of music and her feelings won’t necessarily tell me what Marigold likes about dream pop.</p>
+    
+    <p>So I stay with my own feelings about the music, mellow yearning and casual wonder that follow the path laid out by each song’s gentle instrumentals and wistful lyrics.</p>
+    
+    <p>When Summertime Vegan’s “Ruins” plays, I imagine myself wandering my sister’s old daydreams—those private realms formed from mythology, memories and desires. They lie in disrepair, decaying with her disregard, their former splendor still evident in what remains. I linger by the gleaming archways of the crystal kingdom’s deserted arcades, then eventually make my way down obsidian streets to the decommissioned observatory where I marvel at the grand alternascope, impressed by the dusty lenses capable of collecting rays of chance to show the remotest of possibilities.</p>
+    
+    <p>6</p>
+    
+    <p>Mom helps me get ready for school, and ready for her means having new wardrobe items. She always wants new seasons to start with “fresh” outfits. In the department store downtown, she’s on the lookout for that freshness, passing rack after rack and stopping for a close look only when something attracts her attention, much the same way she moves through the grocery store. I follow after her without much interest, content to wear the same clothes I’ve been wearing. I’m used to them, and they’re comfortable.</p>
+    
+    <p>And with or without new clothing, I never really feel ready for school—am never psychologically prepared for it, until I’m sitting in a classroom on the first day, at last rising to the occasion once it’s occurring. Though maybe that means I’ll feel even less ready without some of these shirts and pants we’re picking out. And even with Mom’s pickiness and my indifference, we gather up armfuls of them for me to try on, their hangers doubled and tripled up on the few hooks in the dressing room.</p>
+    
+    <p>“Let me get a good look at you,” Mom says when I step out for the first of what will be many times here.</p>
+    
+    <p>I turn around in place, each step on the hard carpet taken slowly.</p>
+    
+    <p>The instant I’m facing Mom again, I recognize the sharp focus in her eyes. She’s seeing Marigold in me. She can’t help it.</p>
+    
+    <p>“Blue looks good on you,” she says.</p>
+    
+    <p>And I know I’m getting this shirt, even though I don’t know what I’ll wear with it or how I feel about the loose fit. Because I do know that blue always looks good on Marigold.</p>
+    
+    <p>7</p>
+    
+    <p>After I’ve been back in the city for half a week, we get one of those late-summer days when the the blazing heat eases up, and the air is warm and breezy—the way it usually is in Sastalama. Perfect for picnics. I miss the ones we’d have on the riverbanks. Miss them so much that I make an avo-mayo sandwich—following Granma’s proportioning of avocado to mayonnaise to cilantro—then take it to the little park down the street.</p>
+    
+    <p>Sitting on a bench under one of the neighborhood’s few oak trees, I eat my sandwich. This only makes me miss Sastalama more.</p>
+    
+    <p>At least things will be mostly the same when we go back. Only enough time will have passed for modest changes. The lettuces we moved from the greenhouse to the garden will have grown (Granma may even have harvested some leaves), but the saturnea will still be in bloom, each meadow still a miniature cosmos with those blossoms like little ringed planets. Granma will have finished Love Conquers Others and have an age-appropriate summary of that psy-fi novel ready for me. But she will still be working on her latest paintings, the ones she calls portraits of the psyche, and even after she’s finished them, she still won’t reveal whose psyches they are until I’ve guessed correctly.</p>
+    
+    <p>Maybe this time difference makes it easier for Granma to say goodbye to me and Mom because we’ll be back in just a few weeks. When she sees us off, Granma is always smiling, and I’d be pretty upbeat too if I got to see her again in less than a month. But even if each goodbye isn’t that hard on her, the overall situation could be much harder on Granma than it is on me because for her, we change so quickly. She’s seen me grow up in the span of a couple years and seen her daughter rapidly progress through adulthood, with a daughter of her own already fledged now—or close to it—another soon to follow…</p>
+    
+    <p>8</p>
+    
+    <p>With school starting in less than a week, Mom goes into Checklist Mode. That’s what I began calling it when I noticed that Marigold had picked up this way of doing things from Mom. Her days are now punctuated by bouts of writing out, looking over and working through checklists.</p>
+    
+    <p>Mom doesn’t call this anything. She just does it. Was Granma ever like this? Seems unlikely.</p>
+    
+    <p>In the hallway upstairs, Mom tapes up a piece of paper with household tasks that need to be taken care of. Her way of getting me into Checklist Mode.<br>
+    ☐ Get Snacks<br>
+    ☐ Pack Snacks<br>
+    ☐ Check Toiletries<br>
+    ☐ Restock Pantry<br>
+    ☑︎ Wash New Clothes</p>
+    
+    <p>It works. When I’m in the bathroom, I look through the supplies for a new tube of toothpaste, pack of floss, bottle of shampoo and bar of soap. We have them all, ready to go when the current ones run out, except shampoo. So I check off “Check Toiletries” and add “Buy Shampoo” to the bottom of the list.</p>
+    
+    <p>9</p>
+    
+    <p>Aeterna wants to hang out before we’re back in school, so I go over to her house wearing the new blue shirt, to get used to it—and see if she makes any comments about it.</p>
+    
+    <p>While taking the bus to her neighborhood, I realize that I didn’t really think about Aeterna—let alone miss her—during my days in Sastalama. There was little to remind me of her, especially when I was hiking on mountain trails and canoeing in the lake. The few times she crossed my mind, Aeterna seemed incredibly far away, as though outside my life. But she’s right back in it the moment she opens the front door to her house, smiling at me like she’s announcing her return. And I’m happy that Aeterna invited me over.</p>
+    
+    <p>We sit on the swinging bench in her backyard, kept cool by the neighbor’s tall birches, the shadows of their leaves marbling Aeterna’s lilac blouse and khaki pants. She tells me about the summer festivals, how she danced down the streets in the evening parades and played the ukulele for the puppet shows. The more Aeterna says, the more her voice alternates between excitement and disappointment.</p>
+    
+    <p>When she says, “The energy of all the performers and the whole crowd was incredible,” her words are as chipper as the house finch chittering in a nearby tree. But then she says, “I wish you could have felt some of that,” and it’s like dark clouds have swept across the sky.</p>
+    
+    <p>Once she’s told me everything, there’s only silence between us, and in it, all that she’s said condenses to its essence: she’s proud of her performances and happy about the praise she got, but I didn’t see any of what she worked so hard on.</p>
+    
+    <p>I want to become Mari because she would know what kind things to say now. But Aeterna doesn’t know that I can become Mari. She hasn’t seen my sister in a while and thinks Marigold is still Mari. Despite all the things we’ve told each other, I never told her what happened with Mari—keeping her like a secret between me and Marigold.</p>
+    
+    <p>Left to say only what I can say, I tell Aeterna, “Sounds like you were great. Sorry I missed your performances.”</p>
+    
+    <p>She doesn’t answer, and even though I haven’t seen her cry for years, I worry that Aeterna might cry now. She always went quiet before crying.</p>
+    
+    <p>So I add, “Maybe you can show or play me something. If you want.”</p>
+    
+    <p>“Now?”</p>
+    
+    <p>“Or another time.”</p>
+    
+    <p>Then she’s quiet again, and I try to think of something else to say. But before I can come up with anything, Aeterna rises from the bench, sending me gliding back a little. In an instant, she transforms into a whirlwind of elegant twirls and sweeping gestures, arms arcing through the air, bare feet flitting about the grass—her body a dynamo of fluid, vigorous movement. She reminds me of a hawk swooping and lifting high above the treetops with the ease and elegance of masterful flight.</p>
+    
+    <p>“It’s better when I’m in costume,” she says, moving even faster now. “And when there’s music.”</p>
+    
+    <p>“You look amazing,” I reply, that house finch’s song already all the musical accompaniment I need.</p>
+    
+    <p>10</p>
+    
+    <p>On the bus ride home, I become Mari and think back to Aeterna dancing in her backyard then let Mari’s thoughts envelop mine.</p>
+    
+    <p>Such splendid dancing! And how nice that she enjoyed having a private audience for that performance.</p>
+    
+    <p>I marvel at how Mari has put into words exactly what I feel—what both of us feel. Our agreement encourages me to put my thoughts into words and listen to whether they sound true. Then I’m no longer Mari, only myself with my own words. They come haltingly.</p>
+    
+    <p>Even after all this time, Aeterna and I are still… learning… how to be friends… what each of us needs and wants in life… and in a friendship, how the other can—or can’t—give… or offer? …those things.</p>
+    
+    <p>Is that what happened to my sister? Maybe she learned what she needs, what she can and cannot give, how to be a sister and daughter during this time in her life.</p>
+    
+    <p>Before I know it, the bus is already at the part of the route that runs along the city gardens, and the window beside me fills with lush greenery speckled with bright flowers. Jarred by this shift that has swapped concrete for chlorophyll, my eyes refocus, making my reflection visible against a background of blossoms that are like confetti blowing by. Mom was right—this shirt does suit me. The loose fit is causal and relaxed, with a spaciousness that allows the shirt to be filled not by my torso alone but with air and movement too.</p>
+    
+    <p>My gaze lifts from the shirt and meets the transparent features of my face, among them the ones that allow Mom to see Marigold through me—see that ever rosy tinge in her cheeks, the crinkles from all the squinting while out during sunny days. Like heirlooms fashioned by Marigold then given to me, they’re precious and comforting and suddenly make me the most ready I’ve ever been for school, full of something resembling certainty—along with curiosity. Did Marigold decide to be who she is in order to ready herself for adulthood?</p>
+    
+    <p>11</p>
+    
+    <p>Cross legged on Marigold’s bed with my back to her desk and a pattern of thick and thin stripes beneath me, I stare out the window that would shower my sister with fresh sunlight and wake her up long before Mom’s alarm clock would go off. Now though, the full force of the sun stays outside, flooding the little wilderness of the backyard where songbirds alight in that beautiful chaos of rampant summer vegetation Mari dubbed the backjungle. Of all the places we’ve been in together, this is the one that most reminds me of Mari. And memories might be enough.</p>
+    
+    <p>I think about giving her to Granma so she can have Mari’s company anytime and better know who my sister once was. By my estimation, Granma has only spent a couple months with Mari, while I’ve had years with her. Though on second thought, Granma probably knows Mari well enough—no doubt better than I do in certain ways, through the perspectives only worldly experience can grant. Ones that probably allow her to express what she doesn’t say by treating painting as the exact opposite of sculpting—the 2D layering of color.</p>
+    
+    <p>Perspectives that await me somewhere in the future, that I’ll use to see Mari, Marigold and myself with clarity—the truth of who each of us is and how we’ve spent our time together. Akin, I imagine, to the way my gaze can be lost in the unruly fiefdom of teeming plant life behind the house, yet in the next instant unravel the hose vine from the moon heather and tell that the saber ferns and wolfstooth bracken are different but related.</p>
+    
+    <p>Mom will be back from work soon, but until I hear the front door open, I’ll stay perched atop Marigold’s bed, enchanted by the abundance that the growing season has unfurled in the fragment of unfettered terrain behind our home.</p>
+</div>
+
+<!-- SVG filter: animated TV-style static + slight displacement -->
+<svg width="0" height="0" style="position:absolute">
+  <filter id="staticNoise">
+    <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="1" seed="1" result="n">
+      <animate attributeName="seed" values="1;2;3;4;5;6;7;8;9;10" dur="0.4s" repeatCount="indefinite"/>
+    </feTurbulence>
+    <feComponentTransfer in="n" result="n2">
+      <feFuncR type="linear" slope="1.2"/><feFuncG type="linear" slope="1.2"/><feFuncB type="linear" slope="1.2"/>
+    </feComponentTransfer>
+    <feBlend in="SourceGraphic" in2="n2" mode="hard-light" result="noised"/>
+    <feDisplacementMap in="noised" in2="n" scale="60" xChannelSelector="R" yChannelSelector="G"/>
+  </filter>
+</svg>
+
+<script>
+  const root = document.documentElement;
+  const header = document.querySelector('.header');
+
+  // Update CSS vars so the static circle tracks the pointer smoothly
+  let rafId = null;
+  let pending = null;
+
+  function setPos(x, y){
+    const top = header.offsetHeight;
+    const localY = Math.max(0, y - top); // coordinates inside the image region box
+    root.style.setProperty('--x', x + 'px');
+    root.style.setProperty('--y', localY + 'px');
+  }
+
+  function queuePos(e){
+    const x = e.clientX, y = e.clientY;
+    pending = {x, y};
+    if (!rafId){
+      rafId = requestAnimationFrame(() => {
+        if (pending) setPos(pending.x, pending.y);
+        rafId = null;
+        pending = null;
+      });
+    }
+  }
+
+  // Mouse + touch
+  window.addEventListener('mousemove', queuePos, {passive:true});
+  window.addEventListener('touchmove', (e) => {
+    const t = e.touches[0]; if (!t) return;
+    queuePos(t);
+  }, {passive:true});
+
+  // Optional: quick radius/strength keys
+  window.addEventListener('keydown', (e) => {
+    const get = (v)=>parseFloat(getComputedStyle(root).getPropertyValue(v))||0;
+    if (e.key === '[') root.style.setProperty('--r', Math.max(30, get('--r')-10) + 'px');
+    if (e.key === ']') root.style.setProperty('--r', (get('--r')+10) + 'px');
+
+    const disp = document.querySelector('#staticNoise feDisplacementMap');
+    if (e.key === '-') disp.setAttribute('scale', Math.max(0, (+disp.getAttribute('scale')||60)-5));
+    if (e.key === '=') disp.setAttribute('scale', (+disp.getAttribute('scale')||60)+5);
+  });
+
+  // Initialize to current center so you see it immediately
+  setPos(window.innerWidth/2, header.offsetHeight + (window.innerHeight - header.offsetHeight)/2);
+  let r = parseInt(getComputedStyle(root).getPropertyValue('--r')) || 110;
+
+function grow() {
+  r += 0.5; // how fast it grows (pixels per frame)
+  root.style.setProperty('--r', r + 'px');
+  requestAnimationFrame(grow);
+}
+
+grow();
+</script>
+
+</body>
+</html>
