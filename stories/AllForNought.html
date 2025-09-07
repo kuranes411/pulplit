@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Noughtism — Flickery Monospace</title>
+  <style>
+    :root{
+      --page-max: 920px;
+      --side-pad: 44px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", "Courier New", monospace;
+      --mono-weight: 300;
+      --size: 10pt;
+      --line-h: 1.75;
+      --ink: #111;
+      --bg: #fff;
+
+      --max-blur: 0.7px;
+      --max-jiggle: 0.35px;
+      --delay-max: 0.8s;
+    }
+    html, body { height: 100%; margin: 0; background: var(--bg); }
+    .page{
+      box-sizing: border-box;
+      max-width: var(--page-max);
+      margin: 0 auto;
+      padding: 56px var(--side-pad) 120px;
+      color: var(--ink);
+      font: var(--mono-weight) var(--size) var(--mono);
+      line-height: var(--line-h);
+    }
+    .cline{ margin: 0 0 calc(0.5em * var(--line-h)); }
+    .ch{ display:inline-block; will-change: filter, opacity, transform; }
+    @keyframes flicker {
+      0%   { opacity: var(--op1); filter: blur(var(--bl1)); transform: translate(var(--tx), var(--ty)); }
+      49%  { opacity: var(--op2); filter: blur(var(--bl2)); transform: translate(calc(var(--tx) * -1), calc(var(--ty) * -1)); }
+      50%  { opacity: var(--op3); filter: blur(var(--bl3)); transform: translate(var(--tx), var(--ty)); }
+      100% { opacity: var(--op1); filter: blur(var(--bl1)); transform: translate(0,0); }
+    }
+    @media (prefers-reduced-motion: reduce){
+      .ch{ animation: none !important; filter: none !important; transform: none !important; opacity: 1 !important; }
+    }
+    .header {
+position: relative;
+top: 20px;
+left: 160px;
+color: #000000;
+font-size: 70px;
+font-weight: 300;
+z-index: 1;
+pointer-events: none;
+}
+.subheader {
+position: relative;
+top: 20px;
+left: 180px;
+color: #000000;
+font-size: 30px;
+font-weight: 200;
+z-index: 1;
+pointer-events: none;
+}
+
+/* Button */
+.flicker-toggle{
+  position: fixed;
+  top: 40px;
+  right: 120px;
+  z-index: 1000;
+  background: rgba(255,255,255,0.9);
+  color: #111;
+  border: 1px solid #ccc;
+  border-radius: 999px;
+  padding: 8px 12px;
+  font: 600 12px/1 system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+  cursor: pointer;
+  backdrop-filter: blur(4px);
+}
+.flicker-toggle[aria-pressed="false"] { opacity: 0.75; }
+
+/* Turn flicker off (assumes your characters use class .ch) */
+body.flicker-off .ch{
+  animation: none !important;
+  filter: none !important;
+  transform: none !important;
+  opacity: 1 !important;
+}
+
+  </style>
+</head>
+<body>
+  <button id="flickerToggle" class="flicker-toggle" aria-pressed="true" title="Toggle flicker">
+    Flicker: ON
+  </button>
+  <div class="header">All for Nought</div>
+  <div class="subheader">Marco Etheridge</div>
+  <main class="page" id="page"></main>
+  <script>
+  // Minimal test content — replace this with your full text once it runs
+  const RAW = `Prior to my epiphany and subsequent fame, I was but a luckless and demoralized creature, banging against the confines of my existence as a doomed moth against a lantern glass. In the weeks following my present imprisonment, the tabloids have focused a tawdry spotlight on my past. Alas for the scandal-hungry editors, there is nothing of note to discover. Only a year ago, I lived as an empty shell, devoid of meaning or direction.
+
+This is not to say that I was content with my lot. Nothing could be further from the truth. My search for meaning knew no bounds. I immersed myself in all manner of religions without benefit. My erratic path caromed off atheism, blundered into nihilism, and then bogged down under an avalanche of self-help   books. My continued failures brought me to a simple conclusion. I was nothing. A falsehood, of course, but a vital step toward the ultimate truth.
+
+I sank into despair. Since I existed without meaning, there seemed no point in continuing my wretched life. Better to end the farce, rather than endure it, or so I thought. Those delusions, as I now know them to be, led me to the rooftop of my apartment building.
+
+To think that I came so close to destroying myself and thus denying the world a fundamental truth. But those were not my thoughts as I stepped up onto that cornice high above the city streets. 
+
+As I took one final look at the world, a flock of pigeons wheeled past at eye level. The ugly birds veered in a tight curve, thus bringing the stragglers into a collision course with my head. Pigeons flashed before my face, their wingbeats loud in my ears. I waved my arms to drive them away. My panic caused me to lose my balance, and I toppled backward onto the roof. A hard crack against the back of my skull, then blackness.
+
+I know not how long I lay unconscious, but when my eyes blinked open, a blinding revelation stabbed into my brain. In that miraculous moment, flat on my back and staring at the empty sky, I knew the truth I had sought for so long. The universe did not exist. This epiphany struck me with the force of a physical blow. 
+
+An overwhelming sensation of relief filled me with unspeakable joy. For so long, I had believed that I was nothing in a universe of something, when in fact, the exact opposite was true. The universe is no more than an empty void. I exist in that void but am not of the void. I am because the universe is not. The solution was simple, as all perfect ideas are when viewed through the lens of hindsight. 
+I remained spreadeagled on my back while blazing thoughts filled my aching skull. Images flashed through my brain, each one complete and linked to the next. It made so much sense! 
+
+In one vision, I heard the constant drumbeat of the daily news cycle and the lie behind it. Humans struggle through a never-ending cascade of disasters. Every evening, the talking heads predict the end of the world, yet that doom is never quite accomplished. Why? The answer came as a jolt. The universe cannot end if it does not exist in the first place.  
+Eventually, I found the strength to stand upright. I rotated in place, taking in all that I could see. The world beneath me appeared bright and clean, as if reborn.
+
+In the days following my epiphany, I barricaded myself inside my apartment. The slightest interaction with other human beings became unthinkable. I ate little and slept only when my mind exhausted itself. After six days, I came to the crux. I must accept the hard truth of my revelation or return to the depths of my former delusion. No, there would be no going back. My purpose clear, I did what any other sane human being would do: I formulated a religion. 
+In that moment, Noughtism was born.
+
+I leaped into my new devotion with an unquenchable fire. A fever burned in my heart as I hammered out what would become the now famous ten precepts of Noughtism. A year and more has passed since those early days. The precepts have spread across the globe, attaining a life of their own. These few simple ideas will live much longer than I will. I repeat them here only for the sake of clarity.
+
+The Ten Precepts
+We are all Jewels in The Void, alone and together.
+Each Jewel exists in The Void but is not of the void.
+No individual Jewel possesses more worth than any other.
+Do not harm a fellow Jewel.
+Allow each Jewel to shine in its own way.
+The choices of other Jewels are their business, not ours.
+There are no masters, only Jewels.
+There are no servants, only Jewels.
+There are no gods, nor demons, only Jewels.
+Be nice to each other as you pass through The Void.
+
+After setting down the precepts, I contemplated what I had done. I decided that each precept deserved an explanation, a simple roadmap if you will, for those who might choose the path of Noughtism. The result of my efforts is entitled “Comments.” This simple pamphlet has since been translated into over twenty languages.
+Here is a brief excerpt from “Comments” on the First Precept:
+
+The first step on the path is to liberate ourselves from a false conception of what is called the universe. The so-called universe is nothing more than The Void. When we envision an all-encompassing universe, we are immediately burdened and reduced under the immense pressures of despair and hopelessness. When, however, we perceive this so-called universe as nothing more than The Void, we become shining Jewels freed from self-created sorrow.
+The next step on the path of Noughtism is to recognize that just as each of you are Jewels, so too are all human beings, no matter how different we may seem to each other. We are alone in The Void and yet we are together, a myriad of Jewels shining each in their own way. When we help another Jewel to shine, we all shine that much brighter.  
+
+I feel it important to note that Noughtism is not derived from any other religion, nor do Noughtists deny or denigrate other faiths. Remember, we allow each Jewel to shine in its own way.
+Critics and supporters alike have said that Noughtism is more a code for living rather than a true religion. I do not care to weigh in on such debates. Religion or philosophy, if Noughtism helps Jewels to shine in The Void, that is all that matters.
+I had crafted the tenets of Noughtism. All that remained was to spread the word, yet I hesitated. I considered door-to-door proselytizers to be the meat bees of the soul, yet after careful research, I found that they have perfected certain techniques and phrases worth emulating. After much reading and thought, I modified a few common phrases employed by these would-be soul stealers.
+ 
+Hello. I’m making just a brief call to share an important message with you.
+Good morning. I’m here to tell you about the good news of The Void.
+
+I’m encouraging folks to look into The Void. The void negates all important questions, which often surprises people.
+May I ask, do you mean that you are not interested in The Void, or is it the universe in general that does not interest you?
+
+Thus began my quest to introduce Noughtism to the world. I did not doubt that Noughtism represented my salvation from demoralization and suffering, yet I fully expected to have doors slammed in my face. This type of rejection did occur, of course. What came as a profound surprise was that so many doors opened and remained open. I was amazed at how the tenets resonated with my fellow human beings, and how quickly.
+As I’m sure you know, those early days have now become the subject of a worldwide debate. I need add only a few minor details to the tidal wave of newspaper articles, editorials, documentaries, and the like.
+
+In the first week, a mere two followers embraced the path of Noughtism. The next week brought ten more. We divided ourselves into pairs to better spread the good news. Then Noughtism began to appear on social media. Word spread like wildfire. It leaped across the land, then across the oceans. The rest is well-documented history.
+As Noughtism made its swift way across the globe, so too did a growing backlash. Established religions feared they would be inundated by the rising tide. 
+
+Governments reacted with consternation. They viewed old religions as useful tools that could be employed to control the populace. The doctrine of Noughtism, however, quickly grew beyond their reach.
+Presidents and Prime Ministers perceived Noughtism as a threat, including those powers that controlled my homeland. These embattled heads of state sought to control or abolish the Ten Precepts. This, of course, was folly. Nothing attracts human interest more than an outright ban. Thus, their efforts came to nothing or rather more than nothing. Fear-based choices often lead to violence and so blood came to be shed.
+I pleaded for peace. I still do, even from my prison cell.  People across the world protested the suppression of Noughtism. Protests escalated into mass demonstrations. Some government forces lost control and fired on the demonstrators. Many lives were lost. In response, a few demonstrators retaliated. The cycle of violence escalated.
+With the rise of civil disobedience and then bloodshed, there were demands for my immediate arrest. Little more than a year after my life-changing epiphany, the police handcuffed me and transported me to a local jail.
+
+ I was charged with crimes against my government. Among those charges were disseminating inflammatory writings, incitement to riot, threatening national security, and treason. The ensuing trial was swift and final. Judge and jury pronounced me guilty on all charges and sentenced me to death.
+The solitude of a prison cell affords long hours for reflection. Now my allotted time draws to a close. This is the eve of my execution. Tomorrow I will die. There will be no resurrection. I appeared as a Jewel in The Void, and now my Jewel will cease to shine. Yet what I leave behind, the simple tenets of Noughtism will live on long after I am forgotten.
+There is a kindly guard here on death row. Not long ago, he brought me my last meal. After setting down my tray, he stood silent. He paused, as if ordering his thoughts, then asked if I had any regrets. I weighed his question with due consideration. 
+
+No, I harbored no regrets. I deplored the senseless violence, but perhaps my death would in some way calm the troubled waters. A profound epiphany had altered the course of my life. Now, here in this cell, that epiphany remained powerful. I could no more deny its truth than fly away from these steel bars.
+The guard nodded to himself, then began to recite the Ten Precepts. I joined him in the recitation and our voices filled the cell. The last words died away. He nodded and stepped out of my cell. The barred door slid closed with a final clang. 
+`;
+
+  const page = document.getElementById('page');
+
+  RAW.split(/\n\s*\n/).forEach(par => {
+    const p = document.createElement('p');
+    p.className = 'cline';
+    const lines = par.split(/\n/);
+    lines.forEach((ln, li) => {
+      for (const ch of ln){
+        const span = document.createElement('span');
+        span.className = 'ch';
+        span.textContent = ch === ' ' ? '\u00A0' : ch;
+
+        const r = Math.random;
+        const getVar = (name) => parseFloat(getComputedStyle(document.documentElement).getPropertyValue(name)) || 0;
+
+        const blMax = getVar('--max-blur');
+        const jig   = getVar('--max-jiggle');
+
+        const bl1 = (r() * blMax).toFixed(2) + 'px';
+        const bl2 = (r() * blMax).toFixed(2) + 'px';
+        const bl3 = (r() * blMax).toFixed(2) + 'px';
+        const tx  = ((r()-0.5) * 2 * jig).toFixed(2) + 'px';
+        const ty  = ((r()-0.5) * 2 * jig).toFixed(2) + 'px';
+        const op1 = (0.88 + r() * 0.12).toFixed(2);
+        const op2 = (0.75 + r() * 0.20).toFixed(2);
+        const op3 = (0.82 + r() * 0.16).toFixed(2);
+        const dur = (0.9 + r() * 1.0).toFixed(2) + 's';
+        const del = (r() * parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--delay-max'))).toFixed(2) + 's';
+
+        span.style.setProperty('--bl1', bl1);
+        span.style.setProperty('--bl2', bl2);
+        span.style.setProperty('--bl3', bl3);
+        span.style.setProperty('--tx', tx);
+        span.style.setProperty('--ty', ty);
+        span.style.setProperty('--op1', op1);
+        span.style.setProperty('--op2', op2);
+        span.style.setProperty('--op3', op3);
+        span.style.animation = `flicker ${dur} steps(2,end) infinite`;
+        span.style.animationDelay = del;
+        p.appendChild(span);
+      }
+      if (li < lines.length - 1) p.appendChild(document.createElement('br'));
+    });
+    page.appendChild(p);
+  });
+  </script>
+  <script>
+    (function () {
+      const btn = document.getElementById('flickerToggle');
+    
+      function setFlicker(on){
+        document.body.classList.toggle('flicker-off', !on);
+        btn.textContent = on ? 'Flicker: ON' : 'Flicker: OFF';
+        btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+        try { localStorage.setItem('flickerOn', on ? '1' : '0'); } catch(e){}
+      }
+    
+      // Restore previous choice
+      const saved = (typeof localStorage !== 'undefined') ? localStorage.getItem('flickerOn') : null;
+      setFlicker(saved !== '0'); // default ON
+    
+      // Click to toggle
+      btn.addEventListener('click', () => {
+        const currentlyOn = !document.body.classList.contains('flicker-off');
+        setFlicker(!currentlyOn);
+      });
+    })();
+    </script>
+    
+</body>
+</html>
+
