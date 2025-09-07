@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Three.js – White Liquid Slosh (3D depth)</title>
+  <style>
+    html, body { height: 100%; margin: 0; background: white; }
+    canvas { display: block; }
+    .hint { position: fixed; inset: auto 0 14px 0; color: #777; text-align: center; font: 12px/1.2 system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; pointer-events:none; }
+  /* Make the Three.js canvas stick to the viewport */
+.liquid-bg {
+  position: fixed;
+  inset: 0;            /* top:0; right:0; bottom:0; left:0 */
+  width: 100vw;
+  height: 100vh;
+  z-index: 1;         /* behind your text/content */
+  display: block;
+}
+
+/* Ensure page can scroll over the fixed canvas */
+body {
+  min-height: 200vh;   /* or however tall your text requires */
+}
+
+/* If you have title/subtitle/hint overlays, keep them above */
+.hint, .dream-text, .dream-overlay {
+  position: fixed;  /* or fixed, if you want them pinned */
+  z-index: 2;
+}
+
+    .header {
+position: relative;
+top: 60px;
+left: 120px;
+color: #858585;
+font-size: 40px;
+font-weight: 300;
+z-index: 1;
+pointer-events: none;
+}
+.subheader {
+position: relative;
+top: 100px;
+left: 300px;
+color: #858585;
+font-size: 20px;
+font-weight: 200;
+z-index: 1;
+pointer-events: none;
+}
+  
+.text {
+position: relative;
+top: 150px;
+left: 500px;
+color: #858585;
+font-size: 20px;
+font-weight: 200;
+z-index: 0;
+pointer-events: none;
+}
+  
+  </style>
+</head>
+<body>
+    <div class="header">The Language of Dreams</div>
+    <div class="subheader">By: Claudia Wysocky </div>
+    <div class="text">
+        <p>Look&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;here.</p>
+        <p>This is the&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;language</p>
+        <p>of dreams.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;It speaks&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;in tongues,</p>
+        <p>in symbols,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;in signs.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;And it whispers</p>
+        <p>to us of&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;things unseen—&nbsp;&nbsp;&nbsp;&nbsp;of secrets lost</p>
+        <p>beneath the&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;waves.</p>
+        <br>
+        <p>We are&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;but vessels&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;for its message,</p>
+        <p>a conduit&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;between worlds.&nbsp;&nbsp;&nbsp;&nbsp;Listen closely.</p>
+        <br>
+        <p>Hear&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;the truth in its riddles,</p>
+        <p>the clarity&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;in its confusion.</p>
+        <br>
+        <p>For this is&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;the language&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;of dreams,</p>
+        <p>and you must&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;learn to speak it.</p>
+      </div>
+      
+  <div class="hint">Move your mouse to nudge the waves. </div>
+  <script type="module">
+    import * as THREE from 'https://unpkg.com/three@0.160.0/build/three.module.js';
+
+    // --- Renderer ---
+    const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance', alpha: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setClearColor(0x000000, 0); 
+    document.body.appendChild(renderer.domElement);
+    renderer.domElement.classList.add('liquid-bg');
+
+    // --- Scene & Camera (orthographic for a fullscreen quad) ---
+    const scene = new THREE.Scene();
+    const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+
+    // --- Uniforms ---
+    const uniforms = {
+      u_time: { value: 0 },
+      u_res: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
+      u_mouse: { value: new THREE.Vector2(0.5, 0.5) },
+      u_aspect: { value: window.innerWidth / window.innerHeight },
+      u_color: { value: new THREE.Color(0xffffff) }
+    };
+
+    // --- Fullscreen quad ---
+    const geometry = new THREE.PlaneGeometry(2, 2);
+
+    // Vertex shader
+    const vert = /* glsl */ `
+      varying vec2 vUv;
+      void main() {
+        vUv = uv;
+        gl_Position = vec4(position, 1.0);
+      }
+    `;
+
+    // Fragment shader with faux-3D lighting (diffuse + spec + fresnel + subsurface)
+    const frag = /* glsl */ `
+      precision highp float;
+
+      uniform float u_time;
+      uniform vec2  u_res;
+      uniform vec2  u_mouse;
+      uniform float u_aspect;
+      uniform vec3  u_color;
+
+      varying vec2 vUv;
+
+      float hash11(float p){ p = fract(p*0.1031); p *= p + 33.33; p *= p + p; return fract(p); }
+      float noise1(float x){
+        float i = floor(x);
+        float f = fract(x);
+        float u = f * f * (3.0 - 2.0 * f);
+        return mix(hash11(i), hash11(i + 1.0), u);
+      }
+      float aastep(float threshold, float x){
+        float afwidth = fwidth(x) * 0.7071;
+        return smoothstep(threshold - afwidth, threshold + afwidth, x);
+      }
+
+      void surfaceAt(float x, float t, float mx, float my, out float S, out float dSdx){
+        float w1 = 0.12 * sin(1.30 * x + 0.80 * t + mx * 0.8);
+        float w2 = 0.06 * sin(2.15 * x - 1.25 * t + my * 0.6);
+        float w3 = 0.03 * sin(4.40 * x + 2.10 * t - mx * 0.4);
+        float n  = (noise1(x / 6.28318 * 2.5 + t * 0.25) - 0.5) * 0.06; // map x back to [0,1]
+        S = 0.5 + w1 + w2 + w3 + n;
+        float dw1dx = 0.12 * 1.30 * cos(1.30 * x + 0.80 * t + mx * 0.8);
+        float dw2dx = 0.06 * 2.15 * cos(2.15 * x - 1.25 * t + my * 0.6);
+        float dw3dx = 0.03 * 4.40 * cos(4.40 * x + 2.10 * t - mx * 0.4);
+        float eps = 0.0025;
+        float nx1 = (noise1((x + eps) / 6.28318 * 2.5 + t * 0.25) - 0.5) * 0.06;
+        float nx0 = (noise1((x - eps) / 6.28318 * 2.5 + t * 0.25) - 0.5) * 0.06;
+        float dndx = (nx1 - nx0) / (2.0 * eps);
+        dSdx = dw1dx + dw2dx + dw3dx + dndx;
+      }
+
+      void main(){
+        vec2 uv = gl_FragCoord.xy / u_res;
+        float t = u_time;
+        float mx = u_mouse.x * 2.0 - 1.0;
+        float my = u_mouse.y * 2.0 - 1.0;
+
+        float x = uv.x * 6.28318; // 0..2π
+        float S, dSdx; surfaceAt(x, t, mx, my, S, dSdx);
+
+        // Clip above surface
+        float liquidMask = 1.0 - aastep(S, uv.y);
+        if(liquidMask <= 0.0){ gl_FragColor = vec4(0.0); return; }
+
+        // Build a pseudo 3D normal from the height field + a small z ripple
+        float band = abs(uv.y - S);
+        float zRipple = 0.12 * sin(10.0 * uv.x + 6.0 * t) * exp(-60.0 * band);
+        vec3 dPdx = normalize(vec3(1.0, dSdx, 0.0));
+        vec3 dPdz = normalize(vec3(0.0, 0.18, 1.0 + zRipple));
+        vec3 N = normalize(cross(dPdz, dPdx));
+
+        // Lighting
+        vec3 L = normalize(vec3(-0.45, 0.85, 0.35)); // key from above-left-front
+        vec3 V = normalize(vec3(0.0, 0.0, 1.0));
+        vec3 H = normalize(L + V);
+        float NdotL = max(dot(N, L), 0.0);
+        float NdotV = max(dot(N, V), 0.0);
+
+        // Thickness below surface at this pixel
+        float d = clamp(S - uv.y, 0.0, 1.0);
+
+        // Terms
+        float diffuse = mix(0.75, 1.00, smoothstep(0.0, 0.12, d)) * NdotL;
+        float spec    = pow(max(dot(N, H), 0.0), 120.0);
+        float bandBoost = 1.0 - smoothstep(0.0, 0.010, band);
+        spec *= bandBoost * 1.8;        // tight crest sparkle
+        float fres    = pow(1.0 - NdotV, 3.0) * 0.6 * bandBoost; // rim brightening
+        float sss     = exp(-48.0 * d) * 0.85 * bandBoost;       // subsurface near crest
+        float rip     = 0.03 * sin(40.0 * uv.x + 6.0 * t) * exp(-120.0 * band);
+
+        // Interior darkening toward bottom
+        float depthShade = mix(0.90, 0.65, smoothstep(0.0, 0.30, uv.y));
+
+        vec3 col = u_color * (depthShade * diffuse + spec + fres + sss + rip);
+        gl_FragColor = vec4(col, 1.0);
+      }
+    `;
+
+    const material = new THREE.ShaderMaterial({
+      vertexShader: vert,
+      fragmentShader: frag,
+      uniforms,
+      transparent: true
+    });
+
+    const quad = new THREE.Mesh(geometry, material);
+    scene.add(quad);
+
+    // Interactivity
+    function setMouse(eX, eY){
+      uniforms.u_mouse.value.set(
+        THREE.MathUtils.clamp(eX / window.innerWidth, 0, 1),
+        THREE.MathUtils.clamp(1 - (eY / window.innerHeight), 0, 1)
+      );
+    }
+    window.addEventListener('mousemove', (e) => setMouse(e.clientX, e.clientY));
+    window.addEventListener('touchmove', (e) => { const t = e.touches[0]; if (t) setMouse(t.clientX, t.clientY); }, { passive: true });
+
+    // Resize
+    function onResize(){
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      uniforms.u_res.value.set(window.innerWidth, window.innerHeight);
+      uniforms.u_aspect.value = window.innerWidth / window.innerHeight;
+    }
+    window.addEventListener('resize', onResize);
+
+    // Animate
+    const clock = new THREE.Clock();
+    function tick(){
+      uniforms.u_time.value += clock.getDelta();
+      renderer.render(scene, camera);
+      requestAnimationFrame(tick);
+    }
+    tick();
+  </script>
+</body>
+</html>
