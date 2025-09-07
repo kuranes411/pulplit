@@ -1,0 +1,747 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Viscera</title>
+  <style>
+    html, body { height: 100%; margin: 0; }
+    body { background: #0f0f12; overflow: auto; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"; }
+    #app { position: fixed; inset: 0; }
+    canvas { display: block; }
+
+    .header {
+position: relative;
+top: 16px;
+left: 16px;
+color: #ffffff;
+font-size: 100px;
+font-weight: 600;
+z-index: 9;
+text-shadow: 0 2px 8px rgba(0,0,0,0.6);
+pointer-events: none;
+}
+.subheader {
+position: relative;
+top: 10px;
+left: 16px;
+color: #ffffff;
+font-size: 30px;
+font-weight: 600;
+z-index: 9;
+text-shadow: 0 2px 8px rgba(0,0,0,0.6);
+pointer-events: none;
+}
+
+.black-box {
+  position: relative;             /* ← no longer fixed */
+  margin: 100px auto 64px;        /* push it below the big header; adjust 200px to taste */
+  width: min(70ch, calc(100vw - 48px));
+  padding: 20px 28px;
+
+  background: #ffffff;
+  color: #000000;
+  border-radius: 15px;
+  box-shadow: 0 0 30px rgba(0,0,0,0.8);
+
+  text-align: left;               /* better for long reading */
+  line-height: 1.6;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 14px;
+
+  pointer-events: auto;           /* user can select/scroll inside */
+  z-index: 9;                     /* above the canvas; fine to keep */
+}
+
+
+/* Centered filler text in white monospace */
+.filler {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #ffffff;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: clamp(12px, 1.8vmin, 16px);
+  line-height: 1.5;
+  max-width: 68ch;
+  text-align: center;
+  letter-spacing: 0.02em;
+  opacity: 0.9;
+  z-index: 9;            /* above canvas, below header */
+  text-shadow: 0 2px 10px rgba(0,0,0,0.45);
+  pointer-events: none;  /* keeps ripple interaction working */
+  padding: 0 2vmin;
+}
+
+  </style>
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.160.1/build/three.module.js"
+      }
+    }
+  </script>
+</head>
+<body>
+  <div id="app"></div>
+  <div class="header">Viscera</div>
+  <div class="subheader">By: Alexandra Cipriani</div>
+  <div class="black-box">
+
+    <p>“I’m home!” The vacant studio apartment said nothing in return.</p>
+  
+    <p>Malayah dropped her water bottle, her keys, her phone, her bag, her copy of Frankenstein, her book’s fallen-out pages, and her lip balm on the floor by the door and shut it close with her heel. Hands now free, she swiped a loose strand of black hair behind her ear, and looked up to see twenty-two eyes peering back at her.</p>
+  
+    <p>Their shininess gleamed from across the tiny room. Deep and black and penetrating. Perfectly round little eyes. Staring.</p>
+  
+    <p>She squealed with glee as she approached them. Her family. Their fuzzy fibers and sewn-on smiles made her serotonin flow as she enveloped each and every plushie in a hug.</p>
+  
+    <p>“I missed you guys.” Malayah whispered into the bunny ears and puppy tail that were squishing against her mouth. She let go of her stuffed animals, and placed a loving kiss on each of their foreheads, one at a time, so no one was left out.</p>
+  
+    <p>“You too, Birdie. I love you all equally. I could never pick a favorite,” she rubbed the polyester parrot’s wing between her fingers. “It would crush me to know that one of you didn’t feel as loved.” She sat with them there for a moment, feeling their cushy softness like a baby in a crib with their blankie, and ended up falling asleep in her plush pile. The empty apartment sat around them. No couch, no chairs, no bed. She had no shelves to put her one borrowed book, and no pots or pans to fill her cabinets whose doors refused to close. Grimy, speckled walls, a creaky and uneven wooden floor, and a constant stench of skunk and bubblegum perfume. The yelling from the street was unbearable, and the traffic from the highway didn’t help, but here in Malayah’s studio, she didn't have a care in the world—her furry friends were with her, and her cheeks began to dry, though she never realized they were wet.</p>
+  
+    <p class="divider">⚜</p>
+  
+    <p>With a final awkward maneuver, she managed to finally sever the last microfiber of the thread with her nail clippers and pulled the knot taut.</p>
+  
+    <p>“You’re all set, Stripey. That’ll hopefully last you another year or two.” She flicked the tiny tiger’s little tail back and forth and traced the spot at its base where she had sewn it back to his bottom. His was an appendage of many thread colors now, with orange from the first few times she tore it off as an infant, red for when she was a kid and they couldn’t find the spool anymore, and a whole rainbow for every other time the piece of felt decided to abandon ship.</p>
+  
+    <p>A kiss for her brave patient, and one for everyone else too.</p>
+  
+    <p>“No one goes unloved in my house.” Her sentence struck her with an agile force, but she didn’t linger. She pulled her bag to her side where she sat against the wall with her stuffed animals surrounding her and pulled out a granola bar. Picking off the chocolate chips, she giggled. Carmelita called her a little girl for favoring the chalky sweetness of the mouth-coating cocoa, but she reveled in the teasing as she popped another onto her tongue and licked its melted residue off her skin. She looked around this place. Her place. Her and her toys’ place, but she didn’t like that word.</p>
+  
+    <p>“Trivializing to a tee.” she said. Fire truck sirens from down below sang back acknowledgement.</p>
+  
+    <p>Barely bigger than her childhood closet, and yet all the more overwhelming with its narcotic odors and sunken ceiling, her studio apartment was a scrapbook still awaiting its first photo, but furniture was not feasible at this time. She shifted on the floor, feeling for the spots where the whining of the wood was most shrill, and went to reach for her Frankenstein book before she felt a buzz at the bottom of her bag. Rifling through its belongings, she wretched her phone out from the backpack’s depths with a crazed look in her eyes.</p>
+  
+    <p>Her breath hitched, and as she wiped the last of the chocolate chip from the corners of her lips, she took a deep breath, straightened her back, and put the phone to her ear.</p>
+  
+    <p>“Hello, mother.”</p>
+  
+    <p>“Malayah. Your father sent the last of your things back home. You should be happy that your cousins will be getting new clothes and books.”</p>
+  
+    <p>“I am happy.”</p>
+  
+    <p>“Good. You still not being a good girl?”</p>
+  
+    <p>“Mother, please. I’ve already said it a million times. I couldn’t be more sor—”</p>
+  
+    <p>“Ah! Not another word.”</p>
+  
+    <p>And with that the call was over; Malayah let her arm fall to her side. Blinking, shivering from the draft, twitching as though rabid, she exhaled another sigh and held her hands to her eyes as she sat on the barren floor.</p>
+  
+    <p>A sensation of curly-twirly fluff fell against her thigh. The brown bear’s body, perpetually leaned-over and plump, bent towards her. She looked down and reached out to fiddle with his misshapen ear—its missing chunk and mismatched fabric sewn in as replacement. He was missing one of his beady spherical eyes, but the blue-button-replacement looked back at her with a shine.</p>
+  
+    <p class="divider">⚜</p>
+  
+    <p>“Hey! I thought you had a big project to finish today?” As she closed the front door with the back of her foot, Malayah plopped down her bag and every other item that was caught in the clutches of her fingers on the floor.</p>
+  
+    <p>“Yeah, I do. Chris, Michael, and I are just taking a break.” From over the phone and above the ruckus of the yowling cries of a toddler from the unit below hers, she could still hear the sound of people in revel.</p>
+  
+    <p>“Sounds like quite a break.” Malayah joked.</p>
+  
+    <p>“Oh, please don’t be so uptight! You’re always such a baby when it comes to anything fun.”</p>
+  
+    <p>“What? I-”</p>
+  
+    <p>“Hey, did I tell you guys about the fucking granola bar the other day? This girl eats like my sister’s kid.” Malayah could discern the sound of laughter on the other end. Her stomach tightened as her palms grew sweaty under the phone’s heat in her hand.</p>
+  
+    <p>“Carm, come on, don’t say that. And I was just kidding before.” She paced a few steps into her studio but turned back after just three since the opposing wall had already met her toes.</p>
+  
+    <p>“Alright, alright, just lighten up! It was a funny story, okay?” The booming voices died down and the closing of a door could be heard. “I’m just teasing. You know I tease because I love.”</p>
+  
+    <p>Malayah shifted on her groaning wooden floor and sighed through her response. “I know.”</p>
+  
+    <p>“I hear a smile in that voice. Just one for me?” Carmelita giggled, and that made her chuckle in return. “See? You could never be mad at me, baby.”</p>
+  
+    <p>“Yeah, you’re right. I couldn’t.” Malayah looked down at her fluffy brood and their impatient eyes as she continued to attempt something like a casual phone call kind of pacing. The room didn’t really allow it, though, so she planted herself at its center. “Were you still thinking of coming over? I know it’s not much compared to your dorm, but there’s this place a few blocks away with that garlic rice you like, and I was thinking—”</p>
+  
+    <p>“Oh, Mal, I’m sorry. I told you I have this project I really need to get done. I know you understand what that’s like, I mean, you’re definitely the smartest person I know. I don’t think I’ve ever seen you forget to turn in a piece of homework or not do some bullshit extra credit in my entire life.”</p>
+  
+    <p>“Yeah, okay, I get it. Just take it easy, please. For me.” Malayah felt her breath linger in her throat like pressure caught in a steam valve.</p>
+  
+    <p>“Anything for you, my sweet. Love you loads!”</p>
+  
+    <p>“I love—” But Carmelita had hung up as the sounds from the fun erupted through her speakers once more before the silence filled the void.</p>
+  
+    <p>Placing the phone with her pile of stuff by the door, Malayah dragged her feet towards the adjacent pile of stuffed toys awaiting her arrival.</p>
+  
+    <p>“Well, I guess she’s busy tonight. It would’ve been nice to see Carm and kiss her stupid face, but it’s okay.” She dropped herself down to the wood with them and breathed in their scent. Earthy and stale, like dust settled on an old dollhouse.</p>
+  
+    <p>“She’s not stupid.” Malayah felt the need to clarify. She looked from Birdie to Wanda, from Kipper to Steve, and dragged Frankenstein out from underneath the button-eyed bear. Lying down on her side with a few friends under her head and another plied to her outward ear, she could almost snuff out the screams of anger and delinquency rising from outside her shitty apartment as the night faded into day.</p>
+  
+    <p class="divider">⚜</p>
+  
+    <p>A knock at the door startled Malayah out of her trance. She was standing in her kitchenette a few days later, leaning against the room temperature door of her hotter-than-room-temperature fridge, fantasizing about the idea of condiments and produce adorning the shelves. The external sound reverberated through her bones and made her marrow zap like electricity. Cautiously, she slid her feet across the floor in her once-white fuzzy socks. She peeped through the peephole; a wide grin found its place on her face as she twisted the jangly loose knob.</p>
+  
+    <p>“Carm!” Malayah hugged the girl that stood before her, and she returned the love with a few gentle pats on her back and a chuckle.</p>
+  
+    <p>“Damn, Malayah! Almost knocked me over.” She wriggled out from her envelopment, and Malayah laughed nervously, feeling the rushing of her heart and the fervor in her veins.</p>
+  
+    <p>“Sorry! I just got a little excited, you know? It’s your first time here!” She backed up so Carmelita could come in. Her eyes went over every surface like a painter’s bristles atop a textured canvas, though it didn’t take long. With no tables or pillows or anything, the tour could be completed with a simple glance, but Malayah was too ecstatic to feel embarrassed.</p>
+  
+    <p>“It sure is, babe. Look at you with your big girl apartment all on your own.”</p>
+  
+    <p>“We’re the same age, and you have your own place, too. I know it’s your favorite joke but I’m pretty sure being in college and having my own apartment might make me more of an adult than you are.”</p>
+  
+    <p>“Okay, fair enough. My parents do pay for all my stuff, so you got a point.” She dawdled in the middle of the room, keeping her tote bag close and her shoes on.</p>
+  
+    <p>“Yeah, it would be nice if my parents wanted to do the same, but…” Malayah trailed off. Carmelita put a hand on her shoulder with a softened look in her eyes.</p>
+  
+    <p>“I know it really sucks, Mal. I don’t know what I’d do if my parents kicked me out just like that. And I know you said it’s because they're Catholics and they don’t like people like us back on the islands and whatever, but seriously, fuck them.”</p>
+  
+    <p>“Carmelita! You can’t say that.” She pulled away from her touch in a humorous way, but Carmelita grabbed her again, this time with more purpose, and let her touch weave its way through her body, before taking Malayah’s chin in her pointer finger and thumb.</p>
+  
+    <p>“I’m serious. You shouldn’t be forced to be something you’re not just because your parents say so. I mean, look at me, you know my parents were pissed when they found out about me. My mom wouldn’t stop cursing and praying to the saints at the same time, and my dad would just scowl whenever he saw me. But guess what? I didn’t care what they thought! I was who I was and I still am who I am, and the world keeps spinning.”</p>
+  
+    <p>“You have such a way with words.” Malayah teased.</p>
+  
+    <p>“I may not be the most eloquent, but I still stand by what I said. You’re better off without them.” Carmelita pulled Malayah’s chin to hers and kissed the girl before her, combat boots encroaching on her stained socks.</p>
+  
+    <p>“And just think how great it’ll be when they stop being assholes and send you all your things.”</p>
+  
+    <p>“Yeah. I can’t wait.” She thought of the plane taking away all of her souvenirs and mementos, her diaries and keepsakes. Her eyes flitted around with haste as her guest appraised the space. A look of realization struck Carmelita’s demeanor as she began digging through the bag on her shoulder.</p>
+  
+    <p>“Oh, before I forget, I got you something.” Malayah took a step closer and raised her hands in anticipation as she pulled out a half-used tube of fabric glue.</p>
+  
+    <p>“I know it probably seems random, and you were hoping for, like, a pan or something more useful, but you’re always fixing up those toys of yours so I thought it would be nice to have some glue instead of painstakingly sewing ‘em back together every time.” She placed the gift in the hands of her beloved—in response, Malayah turned the tube back and forth between her fingers, considering its weight as well as the opaque white color of the dried streaks emanating from the loose lid.</p>
+  
+    <p>“Th-Thanks! This will totally be helpful,” she gestured with the glue to emphasize her fake excitement. “I know you think they’re weird, but I like them.” She giggled half-heartedly.</p>
+  
+    <p>“Hey, if a few toys make you happy, then who am I to judge? Besides, uh, there is something else.”</p>
+  
+    <p>“Oh, yeah? I was thinking we could go to that place down the street. You can probably guess that I don’t have any food here.”</p>
+  
+    <p>“I’d love to, but I can’t.”</p>
+  
+    <p>“Why not?”</p>
+  
+    <p>“Well, I’m… I’m moving, Mal.”</p>
+  
+    <p>Inelastic she stood as the words settled into her pores like unwanted scum. Malayah tried to meet Carmelita’s eyes, but she only tightened the grip on her bag and avoided the desperate gaze of the girl in front of her.</p>
+  
+    <p>“Y-You’re moving? Why? Where? When? H-How is this even possible, I mean, school just started, and—”</p>
+  
+    <p>“I know, I know. It’s a lot. It’s just,” Carmelita pulled a hand through her hair as she looked back and forth and around the room; anywhere but Malayah. “I met someone, okay? And I don’t want you to think you’re, like, a phase for me or anything like that because that is definitely not true. He’s just really sweet and I didn’t want to lead you on, or whatever.”</p>
+  
+    <p>She could only whimper one little word: “He?” Clutching her tote as though it were capable of casting a spell that would make this all go away, she teetered on her feet with exasperation as she finally made eye contact with Malayah.</p>
+  
+    <p>“Yes, okay? Don’t make a big deal out of it. I just wanted to tell you face-to-face. I’m not that big of an asshole, so just, enjoy the glue, okay? Hug your toys and I’m sure you’ll feel better.” Her leather-clad feet were already whisking her away halfway through her words. As she descended the stairs, Malayah darted to the door frame with so much force she slammed her shoulder into its edge, but her pounding heart was too loud for her to even perceive any pain.</p>
+  
+    <p>“Carmelita!” She yelled. But the last flash of her bag behind the corner was all she caught a glimpse of.</p>
+  
+    <p>Turning back to her studio apartment, Malayah didn’t breathe. The air in her lungs, though fluid in its transience, was as solid as the concrete below. And all the air around her was just as stiff in its suffocation of her space. All was still.</p>
+  
+    <p>Her hands trembling, she again noticed the gift in her palm. She brought the tube up to her face, centimeters from her eyelashes, examined it one more time from side-to-side, and flung it against the wall. The popcorn paint splintered.</p>
+  
+    <p>Rushing to her stuffed animals, Malayah couldn’t retrieve any restraint. With Stripey in her clutches, she tore off his tail with a screech. She plucked his arms from his torso, his head from his body, his stuffing flying everywhere.</p>
+  
+    <p>Birdie’s beak soared across the floor. Honey’s button eye was torn from his face like a wolf with its lamb’s esophagus between its maw –– Malayah stood shaking the plushie in her teeth with the bear’s little plastic beans coating every surface. Her snatching hands found Willy and ripped through his soft fleecy belly with anguish in her shaking body. Kipper met a violent demise as her feet slipped on his ears <div class="black-box">
+
+        <p>“I’m home!” The vacant studio apartment said nothing in return.</p>
+      
+        <p>Malayah dropped her water bottle, her keys, her phone, her bag, her copy of Frankenstein, her book’s fallen-out pages, and her lip balm on the floor by the door and shut it close with her heel. Hands now free, she swiped a loose strand of black hair behind her ear, and looked up to see twenty-two eyes peering back at her.</p>
+      
+        <p>Their shininess gleamed from across the tiny room. Deep and black and penetrating. Perfectly round little eyes. Staring.</p>
+      
+        <p>She squealed with glee as she approached them. Her family. Their fuzzy fibers and sewn-on smiles made her serotonin flow as she enveloped each and every plushie in a hug.</p>
+      
+        <p>“I missed you guys.” Malayah whispered into the bunny ears and puppy tail that were squishing against her mouth. She let go of her stuffed animals, and placed a loving kiss on each of their foreheads, one at a time, so no one was left out.</p>
+      
+        <p>“You too, Birdie. I love you all equally. I could never pick a favorite,” she rubbed the polyester parrot’s wing between her fingers. “It would crush me to know that one of you didn’t feel as loved.” She sat with them there for a moment, feeling their cushy softness like a baby in a crib with their blankie, and ended up falling asleep in her plush pile. The empty apartment sat around them. No couch, no chairs, no bed. She had no shelves to put her one borrowed book, and no pots or pans to fill her cabinets whose doors refused to close. Grimy, speckled walls, a creaky and uneven wooden floor, and a constant stench of skunk and bubblegum perfume. The yelling from the street was unbearable, and the traffic from the highway didn’t help, but here in Malayah’s studio, she didn't have a care in the world—her furry friends were with her, and her cheeks began to dry, though she never realized they were wet.</p>
+      
+        <p class="divider">⚜</p>
+      
+        <p>With a final awkward maneuver, she managed to finally sever the last microfiber of the thread with her nail clippers and pulled the knot taut.</p>
+      
+        <p>“You’re all set, Stripey. That’ll hopefully last you another year or two.” She flicked the tiny tiger’s little tail back and forth and traced the spot at its base where she had sewn it back to his bottom. His was an appendage of many thread colors now, with orange from the first few times she tore it off as an infant, red for when she was a kid and they couldn’t find the spool anymore, and a whole rainbow for every other time the piece of felt decided to abandon ship.</p>
+      
+        <p>A kiss for her brave patient, and one for everyone else too.</p>
+      
+        <p>“No one goes unloved in my house.” Her sentence struck her with an agile force, but she didn’t linger. She pulled her bag to her side where she sat against the wall with her stuffed animals surrounding her and pulled out a granola bar. Picking off the chocolate chips, she giggled. Carmelita called her a little girl for favoring the chalky sweetness of the mouth-coating cocoa, but she reveled in the teasing as she popped another onto her tongue and licked its melted residue off her skin. She looked around this place. Her place. Her and her toys’ place, but she didn’t like that word.</p>
+      
+        <p>“Trivializing to a tee.” she said. Fire truck sirens from down below sang back acknowledgement.</p>
+      
+        <p>Barely bigger than her childhood closet, and yet all the more overwhelming with its narcotic odors and sunken ceiling, her studio apartment was a scrapbook still awaiting its first photo, but furniture was not feasible at this time. She shifted on the floor, feeling for the spots where the whining of the wood was most shrill, and went to reach for her Frankenstein book before she felt a buzz at the bottom of her bag. Rifling through its belongings, she wretched her phone out from the backpack’s depths with a crazed look in her eyes.</p>
+      
+        <p>Her breath hitched, and as she wiped the last of the chocolate chip from the corners of her lips, she took a deep breath, straightened her back, and put the phone to her ear.</p>
+      
+        <p>“Hello, mother.”</p>
+      
+        <p>“Malayah. Your father sent the last of your things back home. You should be happy that your cousins will be getting new clothes and books.”</p>
+      
+        <p>“I am happy.”</p>
+      
+        <p>“Good. You still not being a good girl?”</p>
+      
+        <p>“Mother, please. I’ve already said it a million times. I couldn’t be more sor—”</p>
+      
+        <p>“Ah! Not another word.”</p>
+      
+        <p>And with that the call was over; Malayah let her arm fall to her side. Blinking, shivering from the draft, twitching as though rabid, she exhaled another sigh and held her hands to her eyes as she sat on the barren floor.</p>
+      
+        <p>A sensation of curly-twirly fluff fell against her thigh. The brown bear’s body, perpetually leaned-over and plump, bent towards her. She looked down and reached out to fiddle with his misshapen ear—its missing chunk and mismatched fabric sewn in as replacement. He was missing one of his beady spherical eyes, but the blue-button-replacement looked back at her with a shine.</p>
+      
+        <p class="divider">⚜</p>
+      
+        <p>“Hey! I thought you had a big project to finish today?” As she closed the front door with the back of her foot, Malayah plopped down her bag and every other item that was caught in the clutches of her fingers on the floor.</p>
+      
+        <p>“Yeah, I do. Chris, Michael, and I are just taking a break.” From over the phone and above the ruckus of the yowling cries of a toddler from the unit below hers, she could still hear the sound of people in revel.</p>
+      
+        <p>“Sounds like quite a break.” Malayah joked.</p>
+      
+        <p>“Oh, please don’t be so uptight! You’re always such a baby when it comes to anything fun.”</p>
+      
+        <p>“What? I-”</p>
+      
+        <p>“Hey, did I tell you guys about the fucking granola bar the other day? This girl eats like my sister’s kid.” Malayah could discern the sound of laughter on the other end. Her stomach tightened as her palms grew sweaty under the phone’s heat in her hand.</p>
+      
+        <p>“Carm, come on, don’t say that. And I was just kidding before.” She paced a few steps into her studio but turned back after just three since the opposing wall had already met her toes.</p>
+      
+        <p>“Alright, alright, just lighten up! It was a funny story, okay?” The booming voices died down and the closing of a door could be heard. “I’m just teasing. You know I tease because I love.”</p>
+      
+        <p>Malayah shifted on her groaning wooden floor and sighed through her response. “I know.”</p>
+      
+        <p>“I hear a smile in that voice. Just one for me?” Carmelita giggled, and that made her chuckle in return. “See? You could never be mad at me, baby.”</p>
+      
+        <p>“Yeah, you’re right. I couldn’t.” Malayah looked down at her fluffy brood and their impatient eyes as she continued to attempt something like a casual phone call kind of pacing. The room didn’t really allow it, though, so she planted herself at its center. “Were you still thinking of coming over? I know it’s not much compared to your dorm, but there’s this place a few blocks away with that garlic rice you like, and I was thinking—”</p>
+      
+        <p>“Oh, Mal, I’m sorry. I told you I have this project I really need to get done. I know you understand what that’s like, I mean, you’re definitely the smartest person I know. I don’t think I’ve ever seen you forget to turn in a piece of homework or not do some bullshit extra credit in my entire life.”</p>
+      
+        <p>“Yeah, okay, I get it. Just take it easy, please. For me.” Malayah felt her breath linger in her throat like pressure caught in a steam valve.</p>
+      
+        <p>“Anything for you, my sweet. Love you loads!”</p>
+      
+        <p>“I love—” But Carmelita had hung up as the sounds from the fun erupted through her speakers once more before the silence filled the void.</p>
+      
+        <p>Placing the phone with her pile of stuff by the door, Malayah dragged her feet towards the adjacent pile of stuffed toys awaiting her arrival.</p>
+      
+        <p>“Well, I guess she’s busy tonight. It would’ve been nice to see Carm and kiss her stupid face, but it’s okay.” She dropped herself down to the wood with them and breathed in their scent. Earthy and stale, like dust settled on an old dollhouse.</p>
+      
+        <p>“She’s not stupid.” Malayah felt the need to clarify. She looked from Birdie to Wanda, from Kipper to Steve, and dragged Frankenstein out from underneath the button-eyed bear. Lying down on her side with a few friends under her head and another plied to her outward ear, she could almost snuff out the screams of anger and delinquency rising from outside her shitty apartment as the night faded into day.</p>
+      
+        <p class="divider">⚜</p>
+      
+        <p>A knock at the door startled Malayah out of her trance. She was standing in her kitchenette a few days later, leaning against the room temperature door of her hotter-than-room-temperature fridge, fantasizing about the idea of condiments and produce adorning the shelves. The external sound reverberated through her bones and made her marrow zap like electricity. Cautiously, she slid her feet across the floor in her once-white fuzzy socks. She peeped through the peephole; a wide grin found its place on her face as she twisted the jangly loose knob.</p>
+      
+        <p>“Carm!” Malayah hugged the girl that stood before her, and she returned the love with a few gentle pats on her back and a chuckle.</p>
+      
+        <p>“Damn, Malayah! Almost knocked me over.” She wriggled out from her envelopment, and Malayah laughed nervously, feeling the rushing of her heart and the fervor in her veins.</p>
+      
+        <p>“Sorry! I just got a little excited, you know? It’s your first time here!” She backed up so Carmelita could come in. Her eyes went over every surface like a painter’s bristles atop a textured canvas, though it didn’t take long. With no tables or pillows or anything, the tour could be completed with a simple glance, but Malayah was too ecstatic to feel embarrassed.</p>
+      
+        <p>“It sure is, babe. Look at you with your big girl apartment all on your own.”</p>
+      
+        <p>“We’re the same age, and you have your own place, too. I know it’s your favorite joke but I’m pretty sure being in college and having my own apartment might make me more of an adult than you are.”</p>
+      
+        <p>“Okay, fair enough. My parents do pay for all my stuff, so you got a point.” She dawdled in the middle of the room, keeping her tote bag close and her shoes on.</p>
+      
+        <p>“Yeah, it would be nice if my parents wanted to do the same, but…” Malayah trailed off. Carmelita put a hand on her shoulder with a softened look in her eyes.</p>
+      
+        <p>“I know it really sucks, Mal. I don’t know what I’d do if my parents kicked me out just like that. And I know you said it’s because their Catholics and they don’t like people like us back on the islands and whatever, but seriously, fuck them.”</p>
+      
+        <p>“Carmelita! You can’t say that.” She pulled away from her touch in a humorous way, but Carmelita grabbed her again, this time with more purpose, and let her touch weave its way through her body, before taking Malayah’s chin in her pointer finger and thumb.</p>
+      
+        <p>“I’m serious. You shouldn’t be forced to be something you’re not just because your parents say so. I mean, look at me, you know my parents were pissed when they found out about me. My mom wouldn’t stop cursing and praying to the saints at the same time, and my dad would just scowl whenever he saw me. But guess what? I didn’t care what they thought! I was who I was and I still am who I am, and the world keeps spinning.”</p>
+      
+        <p>“You have such a way with words.” Malayah teased.</p>
+      
+        <p>“I may not be the most eloquent, but I still stand by what I said. You’re better off without them.” Carmelita pulled Malayah’s chin to hers and kissed the girl before her, combat boots encroaching on her stained socks.</p>
+      
+        <p>“And just think how great it’ll be when they stop being assholes and send you all your things.”</p>
+      
+        <p>“Yeah. I can’t wait.” She thought of the plane taking away all of her souvenirs and mementos, her diaries and keepsakes. Her eyes flitted around with haste as her guest appraised the space. A look of realization struck Carmelita’s demeanor as she began digging through the bag on her shoulder.</p>
+      
+        <p>“Oh, before I forget, I got you something.” Malayah took a step closer and raised her hands in anticipation as she pulled out a half-used tube of fabric glue.</p>
+      
+        <p>“I know it probably seems random, and you were hoping for, like, a pan or something more useful, but you’re always fixing up those toys of yours so I thought it would be nice to have some glue instead of painstakingly sewing ‘em back together every time.” She placed the gift in the hands of her beloved—in response, Malayah turned the tube back and forth between her fingers, considering its weight as well as the opaque white color of the dried streaks emanating from the loose lid.</p>
+      
+        <p>“Th-Thanks! This will totally be helpful,” she gestured with the glue to emphasize her fake excitement. “I know you think they’re weird, but I like them.” She giggled half-heartedly.</p>
+      
+        <p>“Hey, if a few toys make you happy, then who am I to judge? Besides, uh, there is something else.”</p>
+      
+        <p>“Oh, yeah? I was thinking we could go to that place down the street. You can probably guess that I don’t have any food here.”</p>
+      
+        <p>“I’d love to, but I can’t.”</p>
+      
+        <p>“Why not?”</p>
+      
+        <p>“Well, I’m… I’m moving, Mal.”</p>
+      
+        <p>Inelastic she stood as the words settled into her pores like unwanted scum. Malayah tried to meet Carmelita’s eyes, but she only tightened the grip on her bag and avoided the desperate gaze of the girl in front of her.</p>
+      
+        <p>“Y-You’re moving? Why? Where? When? H-How is this even possible, I mean, school just started, and—”</p>
+      
+        <p>“I know, I know. It’s a lot. It’s just,” Carmelita pulled a hand through her hair as she looked back and forth and around the room; anywhere but Malayah. “I met someone, okay? And I don’t want you to think you’re, like, a phase for me or anything like that because that is definitely not true. He’s just really sweet and I didn’t want to lead you on, or whatever.”</p>
+      
+        <p>She could only whimper one little word: “He?” Clutching her tote as though it were capable of casting a spell that would make this all go away, she teetered on her feet with exasperation as she finally made eye contact with Malayah.</p>
+      
+        <p>“Yes, okay? Don’t make a big deal out of it. I just wanted to tell you face-to-face. I’m not that big of an asshole, so just, enjoy the glue, okay? Hug your toys and I’m sure you’ll feel better.” Her leather-clad feet were already whisking her away halfway through her words. As she descended the stairs, Malayah darted to the door frame with so much force she slammed her shoulder into its edge, but her pounding heart was too loud for her to even perceive any pain.</p>
+      
+        <p>“Carmelita!” She yelled. But the last flash of her bag behind the corner was all she caught a glimpse of.</p>
+      
+        <p>Turning back to her studio apartment, Malayah didn’t breathe. The air in her lungs, though fluid in its transience, was as solid as the concrete below. And all the air around her was just as stiff in its suffocation of her space. All was still.</p>
+      
+        <p>Her hands trembling, she again noticed the gift in her palm. She brought the tube up to her face, centimeters from her eyelashes, examined it one more time from side-to-side, and flung it against the wall. The popcorn paint splintered.</p>
+      
+        <p>Rushing to her stuffed animals, Malayah couldn’t retrieve any restraint. With Stripey in her clutches, she tore off his tail with a screech. She plucked his arms from his torso, his head from his body, his stuffing flying everywhere.</p>
+      
+        <p>Birdie’s beak soared across the floor. Honey’s button eye was torn from his face like a wolf with its lamb’s esophagus between its maw—Malayah stood shaking the plushie in her teeth with the bear’s little plastic beans coating every surface. Her snatching hands found Willy and ripped through his soft fleecy belly with anguish in her shaking body. Kipper met a violent demise as her feet slipped on his ears <div class="black-box">
+
+            <p>“I’m home!” The vacant studio apartment said nothing in return.</p>
+          
+            <p>Malayah dropped her water bottle, her keys, her phone, her bag, her copy of Frankenstein, her book’s fallen-out pages, and her lip balm on the floor by the door and shut it close with her heel. Hands now free, she swiped a loose strand of black hair behind her ear, and looked up to see twenty-two eyes peering back at her.</p>
+          
+            <p>Their shininess gleamed from across the tiny room. Deep and black and penetrating. Perfectly round little eyes. Staring.</p>
+          
+            <p>She squealed with glee as she approached them. Her family. Their fuzzy fibers and sewn-on smiles made her serotonin flow as she enveloped each and every plushie in a hug.</p>
+          
+            <p>“I missed you guys.” Malayah whispered into the bunny ears and puppy tail that were squishing against her mouth. She let go of her stuffed animals, and placed a loving kiss on each of their foreheads, one at a time, so no one was left out.</p>
+          
+            <p>“You too, Birdie. I love you all equally. I could never pick a favorite,” she rubbed the polyester parrot’s wing between her fingers. “It would crush me to know that one of you didn’t feel as loved.” She sat with them there for a moment, feeling their cushy softness like a baby in a crib with their blankie, and ended up falling asleep in her plush pile. The empty apartment sat around them. No couch, no chairs, no bed. She had no shelves to put her one borrowed book, and no pots or pans to fill her cabinets whose doors refused to close. Grimy, speckled walls, a creaky and uneven wooden floor, and a constant stench of skunk and bubblegum perfume. The yelling from the street was unbearable, and the traffic from the highway didn’t help, but here in Malayah’s studio, she didn't have a care in the world—her furry friends were with her, and her cheeks began to dry, though she never realized they were wet.</p>
+          
+            <p class="divider">⚜</p>
+          
+            <p>With a final awkward maneuver, she managed to finally sever the last microfiber of the thread with her nail clippers and pulled the knot taut.</p>
+          
+            <p>“You’re all set, Stripey. That’ll hopefully last you another year or two.” She flicked the tiny tiger’s little tail back and forth and traced the spot at its base where she had sewn it back to his bottom. His was an appendage of many thread colors now, with orange from the first few times she tore it off as an infant, red for when she was a kid and they couldn’t find the spool anymore, and a whole rainbow for every other time the piece of felt decided to abandon ship.</p>
+          
+            <p>A kiss for her brave patient, and one for everyone else too.</p>
+          
+            <p>“No one goes unloved in my house.” Her sentence struck her with an agile force, but she didn’t linger. She pulled her bag to her side where she sat against the wall with her stuffed animals surrounding her and pulled out a granola bar. Picking off the chocolate chips, she giggled. Carmelita called her a little girl for favoring the chalky sweetness of the mouth-coating cocoa, but she reveled in the teasing as she popped another onto her tongue and licked its melted residue off her skin. She looked around this place. Her place. Her and her toys’ place, but she didn’t like that word.</p>
+          
+            <p>“Trivializing to a tee.” she said. Fire truck sirens from down below sang back acknowledgement.</p>
+          
+            <p>Barely bigger than her childhood closet, and yet all the more overwhelming with its narcotic odors and sunken ceiling, her studio apartment was a scrapbook still awaiting its first photo, but furniture was not feasible at this time. She shifted on the floor, feeling for the spots where the whining of the wood was most shrill, and went to reach for her Frankenstein book before she felt a buzz at the bottom of her bag. Rifling through its belongings, she wretched her phone out from the backpack’s depths with a crazed look in her eyes.</p>
+          
+            <p>Her breath hitched, and as she wiped the last of the chocolate chip from the corners of her lips, she took a deep breath, straightened her back, and put the phone to her ear.</p>
+          
+            <p>“Hello, mother.”</p>
+          
+            <p>“Malayah. Your father sent the last of your things back home. You should be happy that your cousins will be getting new clothes and books.”</p>
+          
+            <p>“I am happy.”</p>
+          
+            <p>“Good. You still not being a good girl?”</p>
+          
+            <p>“Mother, please. I’ve already said it a million times. I couldn’t be more sor—”</p>
+          
+            <p>“Ah! Not another word.”</p>
+          
+            <p>And with that the call was over; Malayah let her arm fall to her side. Blinking, shivering from the draft, twitching as though rabid, she exhaled another sigh and held her hands to her eyes as she sat on the barren floor.</p>
+          
+            <p>A sensation of curly-twirly fluff fell against her thigh. The brown bear’s body, perpetually leaned-over and plump, bent towards her. She looked down and reached out to fiddle with his misshapen ear—its missing chunk and mismatched fabric sewn in as replacement. He was missing one of his beady spherical eyes, but the blue-button-replacement looked back at her with a shine.</p>
+          
+            <p class="divider">⚜</p>
+          
+            <p>“Hey! I thought you had a big project to finish today?” As she closed the front door with the back of her foot, Malayah plopped down her bag and every other item that was caught in the clutches of her fingers on the floor.</p>
+          
+            <p>“Yeah, I do. Chris, Michael, and I are just taking a break.” From over the phone and above the ruckus of the yowling cries of a toddler from the unit below hers, she could still hear the sound of people in revel.</p>
+          
+            <p>“Sounds like quite a break.” Malayah joked.</p>
+          
+            <p>“Oh, please don’t be so uptight! You’re always such a baby when it comes to anything fun.”</p>
+          
+            <p>“What? I-”</p>
+          
+            <p>“Hey, did I tell you guys about the fucking granola bar the other day? This girl eats like my sister’s kid.” Malayah could discern the sound of laughter on the other end. Her stomach tightened as her palms grew sweaty under the phone’s heat in her hand.</p>
+          
+            <p>“Carm, come on, don’t say that. And I was just kidding before.” She paced a few steps into her studio but turned back after just three since the opposing wall had already met her toes.</p>
+          
+            <p>“Alright, alright, just lighten up! It was a funny story, okay?” The booming voices died down and the closing of a door could be heard. “I’m just teasing. You know I tease because I love.”</p>
+          
+            <p>Malayah shifted on her groaning wooden floor and sighed through her response. “I know.”</p>
+          
+            <p>“I hear a smile in that voice. Just one for me?” Carmelita giggled, and that made her chuckle in return. “See? You could never be mad at me, baby.”</p>
+          
+            <p>“Yeah, you’re right. I couldn’t.” Malayah looked down at her fluffy brood and their impatient eyes as she continued to attempt something like a casual phone call kind of pacing. The room didn’t really allow it, though, so she planted herself at its center. “Were you still thinking of coming over? I know it’s not much compared to your dorm, but there’s this place a few blocks away with that garlic rice you like, and I was thinking—”</p>
+          
+            <p>“Oh, Mal, I’m sorry. I told you I have this project I really need to get done. I know you understand what that’s like, I mean, you’re definitely the smartest person I know. I don’t think I’ve ever seen you forget to turn in a piece of homework or not do some bullshit extra credit in my entire life.”</p>
+          
+            <p>“Yeah, okay, I get it. Just take it easy, please. For me.” Malayah felt her breath linger in her throat like pressure caught in a steam valve.</p>
+          
+            <p>“Anything for you, my sweet. Love you loads!”</p>
+          
+            <p>“I love—” But Carmelita had hung up as the sounds from the fun erupted through her speakers once more before the silence filled the void.</p>
+          
+            <p>Placing the phone with her pile of stuff by the door, Malayah dragged her feet towards the adjacent pile of stuffed toys awaiting her arrival.</p>
+          
+            <p>“Well, I guess she’s busy tonight. It would’ve been nice to see Carm and kiss her stupid face, but it’s okay.” She dropped herself down to the wood with them and breathed in their scent. Earthy and stale, like dust settled on an old dollhouse.</p>
+          
+            <p>“She’s not stupid.” Malayah felt the need to clarify. She looked from Birdie to Wanda, from Kipper to Steve, and dragged Frankenstein out from underneath the button-eyed bear. Lying down on her side with a few friends under her head and another plied to her outward ear, she could almost snuff out the screams of anger and delinquency rising from outside her shitty apartment as the night faded into day.</p>
+          
+            <p class="divider">⚜</p>
+          
+            <p>A knock at the door startled Malayah out of her trance. She was standing in her kitchenette a few days later, leaning against the room temperature door of her hotter-than-room-temperature fridge, fantasizing about the idea of condiments and produce adorning the shelves. The external sound reverberated through her bones and made her marrow zap like electricity. Cautiously, she slid her feet across the floor in her once-white fuzzy socks. She peeped through the peephole; a wide grin found its place on her face as she twisted the jangly loose knob.</p>
+          
+            <p>“Carm!” Malayah hugged the girl that stood before her, and she returned the love with a few gentle pats on her back and a chuckle.</p>
+          
+            <p>“Damn, Malayah! Almost knocked me over.” She wriggled out from her envelopment, and Malayah laughed nervously, feeling the rushing of her heart and the fervor in her veins.</p>
+          
+            <p>“Sorry! I just got a little excited, you know? It’s your first time here!” She backed up so Carmelita could come in. Her eyes went over every surface like a painter’s bristles atop a textured canvas, though it didn’t take long. With no tables or pillows or anything, the tour could be completed with a simple glance, but Malayah was too ecstatic to feel embarrassed.</p>
+          
+            <p>“It sure is, babe. Look at you with your big girl apartment all on your own.”</p>
+          
+            <p>“We’re the same age, and you have your own place, too. I know it’s your favorite joke but I’m pretty sure being in college and having my own apartment might make me more of an adult than you are.”</p>
+          
+            <p>“Okay, fair enough. My parents do pay for all my stuff, so you got a point.” She dawdled in the middle of the room, keeping her tote bag close and her shoes on.</p>
+          
+            <p>“Yeah, it would be nice if my parents wanted to do the same, but…” Malayah trailed off. Carmelita put a hand on her shoulder with a softened look in her eyes.</p>
+          
+            <p>“I know it really sucks, Mal. I don’t know what I’d do if my parents kicked me out just like that. And I know you said it’s because their Catholics and they don’t like people like us back on the islands and whatever, but seriously, fuck them.”</p>
+          
+            <p>“Carmelita! You can’t say that.” She pulled away from her touch in a humorous way, but Carmelita grabbed her again, this time with more purpose, and let her touch weave its way through her body, before taking Malayah’s chin in her pointer finger and thumb.</p>
+          
+            <p>“I’m serious. You shouldn’t be forced to be something you’re not just because your parents say so. I mean, look at me, you know my parents were pissed when they found out about me. My mom wouldn’t stop cursing and praying to the saints at the same time, and my dad would just scowl whenever he saw me. But guess what? I didn’t care what they thought! I was who I was and I still am who I am, and the world keeps spinning.”</p>
+          
+            <p>“You have such a way with words.” Malayah teased.</p>
+          
+            <p>“I may not be the most eloquent, but I still stand by what I said. You’re better off without them.” Carmelita pulled Malayah’s chin to hers and kissed the girl before her, combat boots encroaching on her stained socks.</p>
+          
+            <p>“And just think how great it’ll be when they stop being assholes and send you all your things.”</p>
+          
+            <p>“Yeah. I can’t wait.” She thought of the plane taking away all of her souvenirs and mementos, her diaries and keepsakes. Her eyes flitted around with haste as her guest appraised the space. A look of realization struck Carmelita’s demeanor as she began digging through the bag on her shoulder.</p>
+          
+            <p>“Oh, before I forget, I got you something.” Malayah took a step closer and raised her hands in anticipation as she pulled out a half-used tube of fabric glue.</p>
+          
+            <p>“I know it probably seems random, and you were hoping for, like, a pan or something more useful, but you’re always fixing up those toys of yours so I thought it would be nice to have some glue instead of painstakingly sewing ‘em back together every time.” She placed the gift in the hands of her beloved—in response, Malayah turned the tube back and forth between her fingers, considering its weight as well as the opaque white color of the dried streaks emanating from the loose lid.</p>
+          
+            <p>“Th-Thanks! This will totally be helpful,” she gestured with the glue to emphasize her fake excitement. “I know you think they’re weird, but I like them.” She giggled half-heartedly.</p>
+          
+            <p>“Hey, if a few toys make you happy, then who am I to judge? Besides, uh, there is something else.”</p>
+          
+            <p>“Oh, yeah? I was thinking we could go to that place down the street. You can probably guess that I don’t have any food here.”</p>
+          
+            <p>“I’d love to, but I can’t.”</p>
+          
+            <p>“Why not?”</p>
+          
+            <p>“Well, I’m… I’m moving, Mal.”</p>
+          
+            <p>Inelastic she stood as the words settled into her pores like unwanted scum. Malayah tried to meet Carmelita’s eyes, but she only tightened the grip on her bag and avoided the desperate gaze of the girl in front of her.</p>
+          
+            <p>“Y-You’re moving? Why? Where? When? H-How is this even possible, I mean, school just started, and—”</p>
+          
+            <p>“I know, I know. It’s a lot. It’s just,” Carmelita pulled a hand through her hair as she looked back and forth and around the room; anywhere but Malayah. “I met someone, okay? And I don’t want you to think you’re, like, a phase for me or anything like that because that is definitely not true. He’s just really sweet and I didn’t want to lead you on, or whatever.”</p>
+          
+            <p>She could only whimper one little word: “He?” Clutching her tote as though it were capable of casting a spell that would make this all go away, she teetered on her feet with exasperation as she finally made eye contact with Malayah.</p>
+          
+            <p>“Yes, okay? Don’t make a big deal out of it. I just wanted to tell you face-to-face. I’m not that big of an asshole, so just, enjoy the glue, okay? Hug your toys and I’m sure you’ll feel better.” Her leather-clad feet were already whisking her away halfway through her words. As she descended the stairs, Malayah darted to the door frame with so much force she slammed her shoulder into its edge, but her pounding heart was too loud for her to even perceive any pain.</p>
+          
+            <p>“Carmelita!” She yelled. But the last flash of her bag behind the corner was all she caught a glimpse of.</p>
+          
+            <p>Turning back to her studio apartment, Malayah didn’t breathe. The air in her lungs, though fluid in its transience, was as solid as the concrete below. And all the air around her was just as stiff in its suffocation of her space. All was still.</p>
+          
+            <p>Her hands trembling, she again noticed the gift in her palm. She brought the tube up to her face, centimeters from her eyelashes, examined it one more time from side-to-side, and flung it against the wall. The popcorn paint splintered.</p>
+          
+            <p>Rushing to her stuffed animals, Malayah couldn’t retrieve any restraint. With Stripey in her clutches, she tore off his tail with a screech. She plucked his arms from his torso, his head from his body, his stuffing flying everywhere.</p>
+          
+            <p>Birdie’s beak soared across the floor. Honey’s button eye was torn from his face like a wolf with its lamb’s esophagus between its maw—Malayah stood shaking the plushie in her teeth with the bear’s little plastic beans coating every surface. Her snatching hands found Willy and ripped through his soft fleecy belly with anguish in her shaking body. Kipper met a violent demise as her feet slipped on his ears and shredded the once-loved velvety lugs to bits. Her howls and growls grew. Her cacophony of agony found respite in the sensation of skin against fuzz, nails blighting cotton. Malayah wailed when she grabbed Wanda by the snout and severed her seams, through to her imagined spine, and split the stuffed animal in half with its cushiony  innards erupting like bile from parted lips. Her feet flung about wildly as more plushies were stomped and disfigured with their threads bleeding through the wooden floorboards. </p>
+
+            <p> 	Stuffing, pellets, and tears flew around like dandelion fluff. Malayah whimpered. Her arms, her legs, her whole being was quivering as the polyester stuck in her hair and glazed her twitching fingers, covered in cuts from the rough edges of all the plastic eyes she plucked out.</p>
+
+            <p>Looking more closely, she winced as she pried the sewing needle from betwixt her middle and ring finger, letting loose a few more tears and whimpers as she watched one centimeter, two centimeters, three centimeters of needle emerge from her flesh, bathed in the butchery. The drip-drop of blood onto the floor was louder than it should have been.</p>
+
+            <p>	With the carnage laid before her, Malayah wiped at her leaking eyes, sniveled the snot back into her nose, and with her needle drenched in crimson, reached for Honey, the blue button, and the thread that had unraveled and pooled at her feet.</p>
+         
+      
+</p>
+  
+  <script type="module">
+    import * as THREE from 'three';
+
+    // --- basic three setup ---
+    const app = document.getElementById('app');
+    const renderer = new THREE.WebGLRenderer({ antialias: false, powerPreference: 'high-performance' });
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    renderer.setSize(innerWidth, innerHeight);
+    renderer.setClearColor(0x0f0f12, 1);
+    app.appendChild(renderer.domElement);
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(60, innerWidth/innerHeight, 0.1, 100);
+    camera.position.set(0, 0, 6.5);
+
+    const clock = new THREE.Clock();
+
+    // --- particle geometry ---
+    const COUNT = 60000; // try 120000 on beefier GPUs
+    const areaX = 22.0, areaY = 6.5; // rectangle spread in the XY plane
+
+    const positions = new Float32Array(COUNT * 3);
+    const colors = new Float32Array(COUNT * 3);
+    const sizes = new Float32Array(COUNT);
+
+    // Color palette with emphasis on pink
+    const palette = [
+      new THREE.Color('#ffd1dc'), // pink (primary)
+      new THREE.Color('#ff56b3'), // light pink
+      new THREE.Color('#ffc0cb'), // pastel pink
+      new THREE.Color('#3b2f2f'), // brown (dark)
+      new THREE.Color('#8b5a2b'), // brown
+      new THREE.Color('#ffc0cb'), // white
+      new THREE.Color('#000000'), // black
+      new THREE.Color('#ffe24a'), // yellow
+      new THREE.Color('#a9a9a9')  // grey
+    ];
+
+    // weights roughly favoring pinks; tweak to taste
+    const weights = [
+      0.28, // pink
+      0.15, // light pink
+      0.12, // pastel pink
+      0.07, // brown dark
+      0.05, // brown
+      0.12, // white
+      0.05, // black
+      0.05, // yellow
+      0.05  // grey
+    ];
+
+    const cumulative = (() => {
+      const c = []; let sum = 0;
+      for (let w of weights) { sum += w; c.push(sum); }
+      // normalize just in case
+      for (let i=0; i<c.length; i++) c[i] /= sum;
+      return c;
+    })();
+
+    function pickColor() {
+      const r = Math.random();
+      let idx = cumulative.findIndex(v => r <= v);
+      if (idx < 0) idx = palette.length - 1;
+      return palette[idx];
+    }
+
+    for (let i = 0; i < COUNT; i++) {
+      const ix = i * 3;
+      // jittered grid for even but organic distribution
+      positions[ix + 0] = (Math.random() - 0.5) * areaX;
+      positions[ix + 1] = (Math.random() - 0.5) * areaY;
+      positions[ix + 2] = (Math.random() - 0.5) * 0.25; // slight depth for parallax
+
+      const c = pickColor();
+      colors[ix + 0] = c.r;
+      colors[ix + 1] = c.g;
+      colors[ix + 2] = c.b;
+
+      sizes[i] = 2.0 + Math.random() * 2.0; // base size; pixel-scaled in shader
+    }
+
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+    geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+
+    // --- shader material ---
+    const material = new THREE.ShaderMaterial({
+      transparent: true,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+      vertexColors: true,
+      uniforms: {
+        uTime: { value: 0 },
+        uMouse: { value: new THREE.Vector2(9999, 9999) }, // offscreen initial
+        uRippleAmp: { value: 0.85 },     // vertical displacement strength
+        uRippleRadius: { value: 2.0 },   // falloff (bigger = faster decay)
+        uRippleSpeed: { value: 2.4 },    // wave travel speed
+        uPixelRatio: { value: Math.min(devicePixelRatio, 2) }
+      },
+      vertexShader: /* glsl */`
+        attribute float size;
+        varying vec3 vColor;
+        uniform float uTime;
+        uniform vec2 uMouse;
+        uniform float uRippleAmp;
+        uniform float uRippleRadius;
+        uniform float uRippleSpeed;
+        uniform float uPixelRatio;
+        
+        void main() {
+          vec3 p = position;
+          // distance in the XY plane to the mouse point
+          vec2 d = p.xy - uMouse;
+          float dist = length(d);
+
+          // Radial sine ripple + exponential decay
+          float ripple = sin(dist * 12.0 - uTime * uRippleSpeed) * exp(-dist * uRippleRadius);
+          p.z += ripple * uRippleAmp;
+
+          // Soft push-away in the plane for a "squishy" response
+          float push = exp(-dist * 6.0);
+          vec2 dir = normalize(d + 1e-5);
+          p.xy += dir * push * 0.15;
+
+          vec4 mv = modelViewMatrix * vec4(p, 1.0);
+          // perspective-correct point size; clamp to keep it sane
+          float ps = size * (300.0 / -mv.z) * (1.0 / uPixelRatio);
+          gl_PointSize = clamp(ps, 1.0, 12.0);
+
+          gl_Position = projectionMatrix * mv;
+          vColor = color;
+        }
+      `,
+      fragmentShader: /* glsl */`
+        precision mediump float;
+        varying vec3 vColor;
+        void main() {
+          // Circular sprite mask for soft particles
+          vec2 uv = gl_PointCoord * 2.0 - 1.0;
+          float r2 = dot(uv, uv);
+          float alpha = smoothstep(1.0, 0.0, r2);
+          gl_FragColor = vec4(vColor, alpha);
+        }
+      `
+    });
+
+    const points = new THREE.Points(geometry, material);
+    points.position.y = -1.1; 
+    scene.add(points);
+
+    // --- mouse → world mapping ---
+    const raycaster = new THREE.Raycaster();
+    const mouseNDC = new THREE.Vector2();
+    const plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0.0); // z=0 plane
+    const planeHit = new THREE.Vector3();
+
+    function updateMouseFromEvent(e) {
+      const x = (e.clientX / innerWidth) * 2 - 1;
+      const y = -(e.clientY / innerHeight) * 2 + 1;
+      mouseNDC.set(x, y);
+      raycaster.setFromCamera(mouseNDC, camera);
+      raycaster.ray.intersectPlane(plane, planeHit);
+      if (planeHit) {
+        material.uniforms.uMouse.value.set(planeHit.x, planeHit.y);
+      }
+    }
+
+    window.addEventListener('pointermove', updateMouseFromEvent);
+    window.addEventListener('pointerdown', updateMouseFromEvent);
+    window.addEventListener('pointerleave', () => {
+      material.uniforms.uMouse.value.set(9999, 9999); // disable effect when off-canvas
+    });
+
+    // --- animate ---
+    renderer.setAnimationLoop(() => {
+      material.uniforms.uTime.value = clock.getElapsedTime();
+      renderer.render(scene, camera);
+    });
+
+    // --- resize ---
+    addEventListener('resize', () => {
+      camera.aspect = innerWidth / innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(innerWidth, innerHeight);
+      material.uniforms.uPixelRatio.value = Math.min(devicePixelRatio, 2);
+    });
+
+    // --- handy tweaks via URL params ---
+    // e.g. ?count=120000&ramp=1.2&speed=3
+    const params = new URLSearchParams(location.search);
+    if (params.has('ramp')) material.uniforms.uRippleAmp.value = parseFloat(params.get('ramp')) || material.uniforms.uRippleAmp.value;
+    if (params.has('speed')) material.uniforms.uRippleSpeed.value = parseFloat(params.get('speed')) || material.uniforms.uRippleSpeed.value;
+    if (params.has('radius')) material.uniforms.uRippleRadius.value = parseFloat(params.get('radius')) || material.uniforms.uRippleRadius.value;
+  </script>
+</body>
+</html>
