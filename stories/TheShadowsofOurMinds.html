@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>The Shadows of Our Minds</title>
+<style>
+  :root{
+    --split: 50vw;              /* live split position */
+    --bg-white: #ffffff;
+    --bg-red: #c5161d;
+    --text-black: #000000;
+    --text-white: #ffffff;
+
+    --font: Arial, Helvetica, sans-serif;
+    --size: 14pt;
+    --weight: 700;              /* bold */
+    --lh: 2.0;                  /* line-height multiplier shared by both columns */
+    --gutter: clamp(12px, 3vw, 48px); /* center gap between columns */
+  }
+
+  html, body { height: 100%; margin: 0; }
+  body {
+    background: var(--bg-white);
+    overflow-y: auto;           /* allow scrolling */
+    font-family: var(--font);
+    font-weight: var(--weight);
+    font-size: var(--size);
+  }
+
+  /* Red half overlays from the split to the right edge — pinned to viewport */
+  .bg-red {
+    position: fixed;
+    inset: 0;
+    background: var(--bg-red);
+    clip-path: polygon(var(--split) 0, 100% 0, 100% 100%, var(--split) 100%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Scrollable content area */
+  .stage {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;     /* halves split at centerline */
+    align-items: start;
+    column-gap: var(--gutter);
+    padding: 10vh 6vw 20vh;             /* top/bottom room so nothing is cut off */
+    min-height: 200vh;                  /* make the page taller (adjust as needed) */
+  }
+
+  /* Columns align to the page centerline */
+  .col-left  { text-align: right;  padding-right: 2vw; }
+  .col-right { text-align: left;   padding-left:  2vw; }
+
+  /* Consistent line spacing */
+  .line { margin: 0; line-height: var(--lh); white-space: nowrap; }
+
+  /* Text colors (toggled by JS) */
+  .on-white { color: var(--text-black); }
+  .on-red   { color: var(--text-white); }
+
+  /* Optional title at top (scrolls with page) */
+  .title {
+position: relative;
+top: 16px;
+left: 16px;
+color: #8a8a8a;
+font-size: 40px;
+font-weight: 600;
+z-index: 9;
+pointer-events: none;
+}
+.subheader {
+position: relative;
+top: 25px;
+left: 16px;
+color: #8a8a8a;
+font-size: 25px;
+font-weight: 200;
+z-index: 9;
+pointer-events: none;
+}
+
+  @media (max-width: 700px){
+    :root{ --gutter: 6vw; }
+    .stage{ grid-template-columns: 1fr; } /* stack columns on narrow screens */
+    .col-left, .col-right { text-align: left; padding: 0; }
+  }
+</style>
+</head>
+<body>
+  <!-- Fixed background color split -->
+  <div class="bg-red" aria-hidden="true"></div>
+
+  <div class="title">The Shadows of Our Minds</div>
+  <div class="subheader">Claire Wysocky</div>
+  <div class="stage">
+    <!-- LEFT COLUMN -->
+    <div class="col col-left on-white" id="colLeft">
+      <p class="line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Can</p>
+      <p class="line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;touch</p>
+      <p class="line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hair?</p>
+      <p class="line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;my</p>
+      <p class="line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;on</p>
+      <p class="line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;shoulder?</p>
+      <p class="line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;the</p>
+      <p class="line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;of</p>
+      <p class="line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;body?</p>
+      <p class="line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;presence</p>
+      <p class="line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;anchor,</p>
+      <p class="line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;me</p>
+     <br>
+      <p class="line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;But</p>
+    <br>
+    <p class="line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;darkness</p>
+    <br>
+    <p class="line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;when</p>
+    <br>
+    <p class="line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;and</p>
+    <br>
+    <p class="line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;I</p>
+    <br>
+    <p class="line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;you</p>
+    <br>
+    <p class="line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;not</p>
+    </div>
+
+    <!-- RIGHT COLUMN -->
+    <div class="col col-right on-red" id="colRight">
+      <p class="line">I&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+      <p class="line">your&nbsp;</p>
+      <p class="line">Place&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+      <p class="line">hand&nbsp;</p>
+      <p class="line">your&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+      <p class="line">Feel&nbsp;</p>
+      <p class="line">warmth&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+      <p class="line">your&nbsp;</p>
+      <p class="line">Your&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+      <p class="line">my&nbsp;</p>
+      <p class="line">keeping&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+      <p class="line">steady.&nbsp;</p>
+     <br>
+      <p class="line">in the&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+      <br>
+      <p class="line">of the night&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+      <br>
+      <p class="line">I close my eyes&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+      <br>
+      <p class="line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;feel you near</p>
+      <br>
+      <p class="line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;know</p>
+      <br>
+      <p class="line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;are</p>
+      <br>
+      <p class="line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;here.</p>
+  </div>
+
+
+
+
+<script>
+  const root = document.documentElement;
+  const colLeft  = document.getElementById('colLeft');
+  const colRight = document.getElementById('colRight');
+
+  let lastSplit = window.innerWidth / 2;
+
+  function setSplit(px){
+    const vw = window.innerWidth || 1;
+    lastSplit = Math.max(0, Math.min(px, vw));
+    root.style.setProperty('--split', lastSplit + 'px');
+    updateTextColors();
+  }
+
+  function updateTextColors(){
+    const rl = colLeft.getBoundingClientRect();   // RIGHT edge of left column
+    const rr = colRight.getBoundingClientRect();  // LEFT  edge of right column
+    const edgeLeft  = rl.right;
+    const edgeRight = rr.left;
+
+    toggle(colLeft,  edgeLeft  < lastSplit ? 'on-white' : 'on-red');
+    toggle(colRight, edgeRight < lastSplit ? 'on-white' : 'on-red');
+  }
+
+  function toggle(el, cls){
+    el.classList.toggle('on-white', cls === 'on-white');
+    el.classList.toggle('on-red',   cls === 'on-red');
+  }
+
+  // Drag split with pointer
+  const handlePointer = x => setSplit(x);
+  window.addEventListener('mousemove', e => handlePointer(e.clientX), {passive:true});
+  window.addEventListener('touchmove', e => { const t = e.touches[0]; if (t) handlePointer(t.clientX); }, {passive:true});
+
+  // Keep colors correct when scrolling/resizing
+  window.addEventListener('scroll', updateTextColors, {passive:true});
+  window.addEventListener('resize', () => setSplit(window.innerWidth/2));
+
+  // Init
+  setSplit(window.innerWidth/2);
+</script>
+</body>
+</html>
+
+
