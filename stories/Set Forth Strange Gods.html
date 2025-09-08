@@ -240,6 +240,24 @@ I turn to look at the wheatfields stretching before me at the side of the highwa
   const stat = document.getElementById('stat');
   const cursor = document.getElementById('cur');
 
+// Pick which lines (1-based) should be bold
+const boldLines = new Set([2, 6, 12]); // <-- edit as you like
+
+// Line-by-line streaming state
+let lineNo = 1;            // current line number
+let curLineEl = null;      // current <div class="line">
+let curTextNode = null;    // text node inside current line
+
+function startNewLine() {
+  curLineEl = document.createElement('div');
+  curLineEl.className = 'line';
+  curLineEl.style.whiteSpace = 'pre-wrap'; // keep tabs/spaces
+  if (boldLines.has(lineNo)) curLineEl.style.fontWeight = 'bold'; // <- bold here
+  curTextNode = document.createTextNode('');
+  curLineEl.appendChild(curTextNode);
+  out.appendChild(curLineEl);
+}
+
   let i = 0;
   let fast = false;
 
@@ -250,8 +268,17 @@ I turn to look at the wheatfields stretching before me at the side of the highwa
     const chunk = Math.min(baseChunk, PAYLOAD.length - i);
 
     // Append next slice
-    out.textContent += PAYLOAD.slice(i, i+chunk);
-    i += chunk;
+    const slice = PAYLOAD.slice(i, i + chunk);
+for (let k = 0; k < slice.length; k++) {
+  const ch = slice[k];
+  if (ch === '\n') {
+    lineNo++;
+    startNewLine();
+  } else {
+    curTextNode.data += ch;
+  }
+}
+
 
     // Progress UI
     const p = Math.floor((i / PAYLOAD.length) * 100);
@@ -281,6 +308,7 @@ I turn to look at the wheatfields stretching before me at the side of the highwa
   }
 
   // Start after a tiny pause
+  startNewLine();
   setTimeout(tick, 400);
 
   // Interactions
