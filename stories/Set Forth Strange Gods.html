@@ -289,7 +289,7 @@ I turn to look at the wheatfields stretching before me at the side of the highwa
     if (e.key.toLowerCase() === 's' && i < PAYLOAD.length){
       // skip to end
       i = PAYLOAD.length;
-      out.textContent = PAYLOAD;
+      out.innerHTML = PAYLOAD;
       bar.style.setProperty('--pct','100%'); pct.textContent = '100%'; stat.textContent='COMPLETE';
       cursor.style.display='none';
       const end = document.createElement('div'); end.className='line';
