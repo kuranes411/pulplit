@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Between the Commute and the Dream</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  html, body { height:100%; margin:0; }
+  body{
+    background:#000;
+    color:#000000;
+    font:21px/1.7 Arial, Helvetica, sans-serif;
+    font-weight:500;
+  }
+
+  /* Title block in top-left corner */
+  .title-block {
+    position:absolute;
+    top:20px;
+    left:20px;
+    color:#544e30;
+    font-family:Arial, Helvetica, sans-serif;
+    z-index:10;
+  }
+  .title-block .header {
+    font-size:58px;   /* large title */
+    font-weight:700;
+    margin:0;
+    line-height:1.1;
+  }
+  .title-block .subheader {
+    font-size:35px;
+    font-weight:600;
+    margin:4px 0 0;
+    line-height:1.2;
+  }
+
+  /* Poem text in center */
+  .poem {
+  position: fixed;                  /* pinned */
+  left: 60%;
+  top: 62%;
+  transform: translate(-50%, -50%);
+  width: min(900px, 92vw);
+
+  /* give it a real height so it can scroll */
+  height: 78vh;                     /* was max-height; use height */
+  overflow: auto;                   /* enable internal scrolling */
+  -webkit-overflow-scrolling: touch;/* smooth on iOS */
+  overscroll-behavior: contain;     /* prevent page scroll chaining */
+  padding: 2vw;
+  box-sizing: border-box;
+  z-index: 2;
+}
+  .poem p { margin:12px 0; }
+
+  /* Static background */
+  .static, .static::before, .static::after{
+    position:fixed; inset:0; pointer-events:none;
+  }
+  .static{ z-index:-1; background:#000; }
+
+  .static::before{
+    content:"";
+    filter:url(#chunkWhiteA);
+    background:#000;
+    opacity:1;
+    animation: driftA 0.6s infinite steps(2,end);
+    mix-blend-mode:screen;
+  }
+
+  .static::after{
+    content:"";
+    filter:url(#chunkWhiteB);
+    background:#000;
+    opacity:0.9;
+    animation: driftB 0.3s infinite steps(2,end);
+    mix-blend-mode:screen;
+  }
+
+  @keyframes driftA {
+    0% { transform:translateY(0) }
+    100% { transform:translateY(-15px) }
+  }
+  @keyframes driftB {
+    0% { transform:translateY(0) }
+    50% { transform:translateY(8px) }
+    100% { transform:translateY(-8px) }
+  }
+</style>
+</head>
+<body>
+
+<div class="static" aria-hidden="true"></div>
+
+<!-- Title + subheader -->
+<div class="title-block">
+  <div class="header">Between the Commute and the Dream</div>
+  <div class="subheader">Abdullah Rahman</div>
+</div>
+
+<!-- Poem body -->
+<div class="poem">
+  <p>The kettle whistles like a tired bird,<br>
+  I pour the water, watch steam rise<br>
+  it curls the way my thoughts curl<br>
+  when I try to remember<br>
+  if I am late,<br>
+  or simply alive.</p>
+
+  <p>On the bus window,<br>
+  raindrops slide in slow races<br>
+  each droplet a planet<br>
+  falling into another.<br>
+  My reflection stares back,<br>
+  half ghost, half passenger,<br>
+  and I wonder<br>
+  how many versions of me<br>
+  are running late today?</p>
+
+  <p>At the crosswalk,<br>
+  the signal blinks red,<br>
+  but inside my head<br>
+  a green light keeps flickering,<br>
+  telling me go, go, go<br>
+  toward something unnamed.</p>
+
+  <p>Every day feels like this<br>
+  a dream disguised as routine.<br>
+  The world hums<br>
+  with vending machines, traffic lights,<br>
+  half-burnt toasts,<br>
+  but underneath it all,<br>
+  I feel a secret rhythm,<br>
+  a heartbeat hidden<br>
+  between footsteps,<br>
+  between sips of tea,<br>
+  between the moment I blink<br>
+  and the moment..</p>
+</div>
+
+<!-- SVG filters -->
+<svg width="0" height="0" style="position:absolute">
+  <filter id="chunkWhiteA">
+    <feTurbulence type="fractalNoise" baseFrequency="0.3" numOctaves="1" seed="2">
+      <animate attributeName="seed" values="2;5;9;12" dur="0.5s" repeatCount="indefinite"/>
+    </feTurbulence>
+    <feColorMatrix type="matrix"
+      values="3 0 0 0 0
+              0 3 0 0 0
+              0 0 3 0 0
+              0 0 0 1 0" />
+  </filter>
+
+  <filter id="chunkWhiteB">
+    <feTurbulence type="fractalNoise" baseFrequency="0.45" numOctaves="1" seed="7">
+      <animate attributeName="seed" values="7;11;15;19" dur="0.35s" repeatCount="indefinite"/>
+    </feTurbulence>
+    <feColorMatrix type="matrix"
+      values="2.5 0 0 0 0
+              0 2.5 0 0 0
+              0 0 2.5 0 0
+              0 0 0 1 0" />
+  </filter>
+</svg>
+
+</body>
+</html>
+
