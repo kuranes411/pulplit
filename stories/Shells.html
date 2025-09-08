@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Dystopian Sandstorm</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  html, body { height:100%; margin:0; background:#968d73; overflow:hidden; }
+  canvas { display:block; width:100%; height:100%; }
+
+  /* Film grain + scanlines + vignette overlays (pure CSS/SVG) */
+  .fx {
+    position: fixed; inset: 0; pointer-events: none; z-index: 5;
+  }
+  .grain {
+    filter: url(#grainFilter);
+    opacity: .22;
+    mix-blend-mode: screen;
+    background: #9d8e6d;
+  }
+  .scan {
+    background:
+      repeating-linear-gradient( to bottom,
+        rgba(255,255,255,.06) 0 1px, rgba(0,0,0,0) 1px 3px );
+    opacity: .08;
+  }
+  .vignette {
+    background:
+      radial-gradient(ellipse at center,
+        rgba(0,0,0,0) 0%,
+        rgba(0,0,0,.25) 60%,
+        rgba(0,0,0,.55) 100%);
+    mix-blend-mode: multiply;
+  }
+
+  /* On-screen caption (optional). Delete if you want pure visuals. */
+  .caption {
+    position: fixed; left: 24px; bottom: 20px; z-index: 6;
+    font: 12px/1.4 Arial, Helvetica, sans-serif; letter-spacing: .08em;
+    color: #b9b9b9; opacity: .7; text-transform: uppercase;
+  }
+
+  .header,
+.subheader {
+  position: fixed;
+  color: #858585;
+  z-index: 10;            /* was 1 — put above overlays */
+  pointer-events: none;
+}
+
+.header { top: 60px; left: 120px; font-size: 40px; font-weight: 300; }
+.subheader { top: 100px; left: 300px; font-size: 20px; font-weight: 200; }
+
+/* Make the prose panel visible and readable on all screens */
+.text {
+  position: fixed;        /* was relative — pin it */
+  right: 20vw;             /* nudge into view instead of big left offset */
+  bottom: 8vh;
+  width: min(640px, 90vw);
+  max-height: 70vh;       /* internal scroll if long */
+  overflow: auto;
+  color: #d1c6b5;
+  font-size: 20px;
+  font-weight: 200;
+  z-index: 10;            /* above overlays */
+  pointer-events: auto;   /* allow selecting/copying */
+  /* optional readability on noisy bg: */
+  text-shadow: 0 1px 2px rgba(0,0,0,.7);
+}
+</style>
+</head>
+<body>
+    <div class="header">Shells of the Lost</div>
+    <div class="subheader">Jeannie Marschal</div>
+<canvas id="storm"></canvas>
+<div class="text">
+    <p>The Sovereign of our enemy is gone, and all Their subjects too. We inch through slanted tubes; through darkness, searching and probing, scenting and calling, but no one answers on the air. No vibrations echo our gentle raps. Dust and debris click and slide against our lithe advance.</p>
+
+<p>There, an armoury—empty now but for their gleaming tools, soldiers and workers and attendants gone. Where? We do not know, but we can guess.</p>
+
+<p>A few brave dead lie close to the feasting hall, guarding the food reserves. It’s all still there—cold-golden chunks of precious resin, pits full of crystals, heaps of jagged skeletons with their funk of dried flesh coating our senses. We’ll see to it later; it is not going anywhere.</p>
+
+<p>The throne room: no busy cascade of feet and no clues either; we move on.</p>
+
+<p>The nursery: abandoned, walls and walls of cribs not vacant, but ghostly quiet. We’ll take the husks—tender even now, if one knows how to treat them, and it is right to honour their short existence; to pick them up and take them down paths that the legs they never grew never knew.</p>
+
+<p>In damp silence, we curve up and right, not a soul around but ours. We branch left and backwards, out and up, and then we feel the tiny indentations in the loam, the ghost-walk many feet rushed over, flowing in from all sides and stampeding down the larger tunnels. There is ecstasy on the air, ground into the soil, and now we know, even before we reach the impact crater.</p>
+
+<p>There they are: thousands upon thousands, congealed around the lure flung from the sunshine-above that shattered their walls, penetrating deep and flooding their senses with frenzied joy as they scrambled all over one another, legs sliding off sleek, hard bodies, happy to stand before nothing and starve in bliss, slow and smiling, unpierced by any weapon. None of their vast skill or knowledge had been any help at all, and we stroke over their corpses with pity. Buried under the first row, our enemy’s Sovereign is now and forever greeting Their lying, disembodied saint. Their vicious limbs are still grotesquely raised, unmoving, desiccated, reaching out in a mockery of worship.</p>
+
+<p>At the centre of it all, the metal box of insidious scents is calling still, keeping an army of fightless ghosts forever trapped for its distant masters. It cannot compel us, but it does strike at us—at what should be, at how the struggle ought to go.</p>
+
+<p>Seething, our body withdraws from blighted spoils. It stretches, slithers into every tunnel; it bloats and hollows out, layering thin, coating every wall and ceiling, swallowing all our calls and molecules and rage back into ourself. We become still, a living cast of this fallen fortress, a fury sharp but hidden, listening, tasting, feeling. Waiting.</p>
+
+<p>They will come for this graveyard, as they’ve cleared out all the others.</p>
+
+<p>This time, we will learn the taste of their flesh.</p>
+
+</div>
+
+<!-- Overlays -->
+<div class="fx grain"></div>
+<div class="fx scan"></div>
+<div class="fx vignette"></div>
+<div class="caption">mode: sandstorm / sector θ-7 / visibility: poor</div>
+
+<!-- SVG grain filter -->
+<svg width="0" height="0" style="position:absolute">
+  <filter id="grainFilter">
+    <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="1" seed="3" result="n">
+      <animate attributeName="seed" values="3;7;11;15;19" dur="0.4s" repeatCount="indefinite"/>
+    </feTurbulence>
+    <feColorMatrix type="matrix" values="
+      1.6 0   0   0  -0.4
+      0   1.6 0   0  -0.4
+      0   0   1.6 0  -0.4
+      0   0   0   1   0" />
+  </filter>
+</svg>
+
+<script>
+(() => {
+  const canvas = document.getElementById('storm');
+  const ctx = canvas.getContext('2d', { alpha: false });
+  let W, H, DPR;
+
+  function resize() {
+    DPR = Math.min(window.devicePixelRatio || 1, 2);
+    W = canvas.width  = Math.floor(window.innerWidth  * DPR);
+    H = canvas.height = Math.floor(window.innerHeight * DPR);
+    canvas.style.width  = window.innerWidth + 'px';
+    canvas.style.height = window.innerHeight + 'px';
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  // Color palette: ashy sand, rust, soot
+  const colors = {
+    bgTop:   '#161819',
+    bgBot:   '#0b0c0d',
+    dust:    'rgba(210, 195, 155, 0.12)', // pale sand
+    debris:  '#6a6761',                   // metal/concrete shards
+    ember:   'rgba(243, 146, 60, 0.55)'   // glowing ember
+  };
+
+  // Background gradient
+  function drawBG() {
+    const g = ctx.createLinearGradient(0, 0, 0, H);
+    g.addColorStop(0, colors.bgTop);
+    g.addColorStop(1, colors.bgBot);
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, W, H);
+  }
+
+  // Wind field (directional with temporal gusts)
+  let baseAngle = Math.PI * 0.02; // shallow rightward
+  let gust = { t: 0, mag: 0, targetMag: 0, targetAngle: baseAngle };
+  function updateWind(dt) {
+    // Occasionally retarget gust strength/angle
+    gust.t += dt;
+    if (gust.t > gust.next || gust.next === undefined) {
+      gust.next = 1.5 + Math.random() * 2.5;
+      gust.t = 0;
+      gust.targetMag = 0.6 + Math.random() * 1.6;
+      gust.targetAngle = baseAngle + (Math.random() * 0.25 - 0.12);
+    }
+    // Ease toward targets
+    gust.mag += (gust.targetMag - gust.mag) * 0.02;
+    baseAngle += (gust.targetAngle - baseAngle) * 0.015;
+  }
+  function windAt(x, y, t) {
+    // Low-cost pseudo-noise: layered sines for eddies
+    const n = Math.sin((x * 0.0009) + t*0.6) * Math.cos((y * 0.0013) - t*0.35);
+    const angle = baseAngle + n * 0.6; // curl
+    const speed = 0.7 + gust.mag + Math.abs(n) * 0.6;
+    return { vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed };
+  }
+
+  // Particles: dust (lots), debris shards (fewer), embers (rare)
+  const DUST_COUNT   = 1400;
+  const DEBRIS_COUNT = 120;
+  const EMBER_COUNT  = 60;
+
+  class Dust {
+    constructor() { this.reset(true); }
+    reset(init=false) {
+      this.x = init ? Math.random()*W : (Math.random() < 0.5 ? -20 : W+20);
+      this.y = Math.random()*H;
+      this.sz = 0.6 + Math.random()*1.4;     // radius
+      this.alpha = 0.08 + Math.random()*0.14;
+      this.drag = 0.94 + Math.random()*0.05; // lingering drift
+      this.vx = (Math.random()*0.5);
+      this.vy = (-0.2 + Math.random()*0.4);
+      this.life = 6 + Math.random()*12;
+      this.age = Math.random()*this.life;
+    }
+    step(dt, t) {
+      const w = windAt(this.x, this.y, t);
+      this.vx = (this.vx * this.drag) + w.vx * 0.8;
+      this.vy = (this.vy * this.drag) + w.vy * 0.8;
+      this.x += this.vx * dt * 60;
+      this.y += this.vy * dt * 60;
+
+      this.age += dt;
+      if (this.x < -50 || this.x > W+50 || this.y < -50 || this.y > H+50 || this.age > this.life) {
+        this.reset();
+      }
+    }
+    draw() {
+      ctx.beginPath();
+      ctx.fillStyle = `rgba(210,195,155,${this.alpha})`;
+      ctx.arc(this.x, this.y, this.sz, 0, Math.PI*2);
+      ctx.fill();
+    }
+  }
+
+  class Debris {
+    constructor() { this.reset(true); }
+    reset(init=false) {
+      this.x = init ? Math.random()*W : (Math.random() < 0.5 ? -60 : W+60);
+      this.y = Math.random()*H;
+      this.len = 8 + Math.random()*24;        // shard length
+      this.th  = 0.6 + Math.random()*1.4;     // thickness
+      this.rot = Math.random()*Math.PI*2;
+      this.spin= (-0.03 + Math.random()*0.06);
+      this.vx = 0; this.vy = 0;
+      this.alpha = 0.18 + Math.random()*0.28;
+    }
+    step(dt, t) {
+      const w = windAt(this.x, this.y, t);
+      this.vx += w.vx * (1.4);
+      this.vy += w.vy * (1.1) + 0.06;       // gravity-ish pull
+      this.x  += this.vx * dt * 20;
+      this.y  += this.vy * dt * 20;
+      this.vx *= 0.96; this.vy *= 0.965;
+      this.rot += this.spin;
+
+      if (this.x < -80 || this.x > W+80 || this.y < -80 || this.y > H+80) this.reset();
+    }
+    draw() {
+      ctx.save();
+      ctx.translate(this.x, this.y);
+      ctx.rotate(this.rot);
+      ctx.globalAlpha = this.alpha;
+      ctx.fillStyle = colors.debris;
+      ctx.fillRect(-this.len*0.5, -this.th*0.5, this.len, this.th);
+      ctx.restore();
+      ctx.globalAlpha = 1;
+    }
+  }
+
+  class Ember {
+    constructor() { this.reset(true); }
+    reset(init=false) {
+      this.x = init ? Math.random()*W : (Math.random() < 0.5 ? -40 : W+40);
+      this.y = Math.random()*H;
+      this.vx = 0; this.vy = 0;
+      this.life = 1.8 + Math.random()*2.6;
+      this.age  = Math.random()*this.life*0.8;
+      this.size = 0.8 + Math.random()*1.6;
+      this.alpha= 0.4 + Math.random()*0.4;
+      this.flick= 0;
+    }
+    step(dt, t) {
+      const w = windAt(this.x, this.y, t);
+      this.vx += w.vx * 2.2;
+      this.vy += w.vy * 2.0 - 0.02; // heat lift
+      this.x  += this.vx * dt * 14;
+      this.y  += this.vy * dt * 14;
+      this.vx *= 0.94; this.vy *= 0.94;
+
+      this.age += dt;
+      this.flick += dt * (6 + Math.random()*4);
+      if (this.age > this.life || this.x < -60 || this.x > W+60 || this.y < -60 || this.y > H+60) this.reset();
+    }
+    draw() {
+      const a = this.alpha * (1 - this.age/this.life);
+      if (a <= 0) return;
+      ctx.globalCompositeOperation = 'lighter';
+      const r = this.size * (0.8 + Math.sin(this.flick)*0.2);
+      const grd = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, r*6);
+      grd.addColorStop(0, `rgba(255,170,80,${a*0.9})`);
+      grd.addColorStop(0.25, `rgba(255,120,40,${a*0.35})`);
+      grd.addColorStop(1, `rgba(0,0,0,0)`);
+      ctx.fillStyle = grd;
+      ctx.beginPath(); ctx.arc(this.x, this.y, r*6, 0, Math.PI*2); ctx.fill();
+      ctx.globalCompositeOperation = 'source-over';
+    }
+  }
+
+  const dust   = Array.from({length: DUST_COUNT},   () => new Dust());
+  const debris = Array.from({length: DEBRIS_COUNT}, () => new Debris());
+  const embers = Array.from({length: EMBER_COUNT},  () => new Ember());
+
+  // Flash + camera shake during heavy gusts
+  let flash = 0;
+  let shake = 0;
+  function maybeFlash(dt) {
+    if (gust.mag > 1.8 && Math.random() < 0.02) {
+      flash = 1;
+      shake = 10; // px in device pixels (scaled by DPR)
+    }
+    if (flash > 0) flash = Math.max(0, flash - dt*2.5);
+    if (shake > 0) shake = Math.max(0, shake - dt*20);
+  }
+
+  let last = performance.now();
+  function frame(now) {
+    const dt = Math.min(0.05, (now - last) / 1000);
+    last = now;
+
+    updateWind(dt);
+    maybeFlash(dt);
+
+    // Camera shake transform
+    ctx.setTransform(1,0,0,1,0,0);
+    const sx = (Math.random()-0.5) * shake;
+    const sy = (Math.random()-0.5) * shake;
+    ctx.translate(sx, sy);
+
+    drawBG();
+
+    // Depth layering: far dust (lighter), debris, embers, near dust (heavier)
+    ctx.globalAlpha = 1;
+    for (let i=0;i<dust.length;i+=2){ dust[i].step(dt, now*0.001); dust[i].draw(); }
+
+    debris.forEach(d => { d.step(dt, now*0.001); d.draw(); });
+
+    embers.forEach(e => { e.step(dt, now*0.001); e.draw(); });
+
+    for (let i=1;i<dust.length;i+=2){ dust[i].step(dt, now*0.001); dust[i].draw(); }
+
+    // Flash overlay
+    if (flash > 0) {
+      ctx.fillStyle = `rgba(255,255,255,${0.15*flash})`;
+      ctx.fillRect(0,0,W,H);
+    }
+
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+
+  // Click toggles intensity: more particles + stronger gusts
+  let boosted = false;
+  window.addEventListener('click', () => {
+    boosted = !boosted;
+    gust.targetMag = boosted ? 2.4 : 1.2;
+    // quick visual feedback via flash
+    flash = 0.6;
+  });
+})();
+</script>
+</body>
+</html>
