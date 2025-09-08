@@ -252,6 +252,75 @@ I turn to look at the wheatfields stretching before me at the side of the highwa
     // Append next slice
     out.textContent = PAYLOAD;
     i += chunk;
+    
+// --- choose which lines should be italic (1-based line numbers) ---
+const italicLines = new Set([2, 4, 7, 12]); // <-- put the exact lines you want here
+
+const lines = PAYLOAD.split('\n');
+let li = 0;
+let fast = false;
+
+function appendLine(text, isItalic){
+  const div = document.createElement('div');
+  div.style.whiteSpace = 'pre-wrap'; // preserves tabs and spacing
+  div.textContent = text;            // safe text
+  if (isItalic) div.style.fontStyle = 'italic';
+  out.appendChild(div);
+}
+
+function renderNextLine(){
+  if (li >= lines.length){
+    cursor.style.display = 'none';
+    const end = document.createElement('div');
+    end.className = 'line';
+    end.textContent = '[done] 100% • hashes verified • link closed';
+    out.appendChild(end);
+    screen.scrollTop = screen.scrollHeight;
+    stat.textContent = 'COMPLETE';
+    bar.style.setProperty('--pct','100%');
+    pct.textContent = '100%';
+    return;
+  }
+
+  const lineNo = li + 1;
+  appendLine(lines[li], italicLines.has(lineNo));
+  li++;
+
+  // progress UI
+  const p = Math.floor((li / lines.length) * 100);
+  bar.style.setProperty('--pct', p + '%');
+  pct.textContent = p + '%';
+  stat.textContent =
+    p < 15 ? 'NEGOTIATING…' :
+    p < 50 ? 'RECEIVING PAYLOAD…' :
+    p < 90 ? 'VERIFYING BLOCKS…' :
+    p < 100 ? 'FINALIZING…' : 'COMPLETE';
+
+  screen.scrollTop = screen.scrollHeight;
+
+  setTimeout(renderNextLine, fast ? 15 : 70 + Math.random()*60);
+}
+
+// start after a tiny pause
+setTimeout(renderNextLine, 400);
+
+// interactions
+document.addEventListener('click', () => { fast = !fast; });
+document.addEventListener('keydown', (e) => {
+  if (e.key.toLowerCase() === 's' && li < lines.length){
+    // finish instantly (respecting italics)
+    for (; li < lines.length; li++){
+      const lineNo = li + 1;
+      appendLine(lines[li], italicLines.has(lineNo));
+    }
+    cursor.style.display = 'none';
+    const end = document.createElement('div'); end.className='line';
+    end.textContent='[done] 100% • hashes verified • link closed';
+    out.appendChild(end);
+    screen.scrollTop = screen.scrollHeight;
+    bar.style.setProperty('--pct','100%'); pct.textContent = '100%'; stat.textContent='COMPLETE';
+  }
+});
 
     // Progress UI
     const p = Math.floor((i / PAYLOAD.length) * 100);
