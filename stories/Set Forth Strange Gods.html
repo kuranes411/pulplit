@@ -250,45 +250,8 @@ I turn to look at the wheatfields stretching before me at the side of the highwa
     const chunk = Math.min(baseChunk, PAYLOAD.length - i);
 
     // Append next slice
-    out.textContent = PAYLOAD;
+    out.textContent += PAYLOAD.slice(i, i+chunk);
     i += chunk;
-
-
-  // progress UI
-  const p = Math.floor((li / lines.length) * 100);
-  bar.style.setProperty('--pct', p + '%');
-  pct.textContent = p + '%';
-  stat.textContent =
-    p < 15 ? 'NEGOTIATING…' :
-    p < 50 ? 'RECEIVING PAYLOAD…' :
-    p < 90 ? 'VERIFYING BLOCKS…' :
-    p < 100 ? 'FINALIZING…' : 'COMPLETE';
-
-  screen.scrollTop = screen.scrollHeight;
-
-  setTimeout(renderNextLine, fast ? 15 : 70 + Math.random()*60);
-}
-
-// start after a tiny pause
-setTimeout(renderNextLine, 400);
-
-// interactions
-document.addEventListener('click', () => { fast = !fast; });
-document.addEventListener('keydown', (e) => {
-  if (e.key.toLowerCase() === 's' && li < lines.length){
-    // finish instantly (respecting italics)
-    for (; li < lines.length; li++){
-      const lineNo = li + 1;
-      appendLine(lines[li], italicLines.has(lineNo));
-    }
-    cursor.style.display = 'none';
-    const end = document.createElement('div'); end.className='line';
-    end.textContent='[done] 100% • hashes verified • link closed';
-    out.appendChild(end);
-    screen.scrollTop = screen.scrollHeight;
-    bar.style.setProperty('--pct','100%'); pct.textContent = '100%'; stat.textContent='COMPLETE';
-  }
-});
 
     // Progress UI
     const p = Math.floor((i / PAYLOAD.length) * 100);
