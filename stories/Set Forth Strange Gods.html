@@ -126,7 +126,7 @@ pointer-events: none;
 
 <script>
   // Your exact text payload (kept verbatim; pre-wrap preserves tabs/line breaks)
-  const PAYLOAD = `Hey Jeannie. Did you know the internet was created as a panopticon?
+  const PAYLOAD = `<i> Hey Jeannie. Did you know the internet was created as a panopticon? </i>
 Who are you? 
 \tI was fantasising about the Library tea-room and raisin scones when that instant message popped up. At first I thought it was some creepy postgrad who’d never had a girlfriend. But my mystery correspondent laid a hook in me:
 I could say I’m from another dimension. Or that I’m right beside you. Wanna talk?
@@ -250,7 +250,7 @@ I turn to look at the wheatfields stretching before me at the side of the highwa
     const chunk = Math.min(baseChunk, PAYLOAD.length - i);
 
     // Append next slice
-    out.textContent += PAYLOAD.slice(i, i+chunk);
+    out.innerHTML += PAYLOAD.slice(i, i+chunk);
     i += chunk;
 
     // Progress UI
