@@ -125,7 +125,7 @@ pointer-events: none;
 
 <script>
   // Your exact text payload (kept verbatim; pre-wrap preserves tabs/line breaks)
-  const PAYLOAD = `Hey Jeannie. Did you know the internet was created as a panopticon?
+  const PAYLOAD = `<b> Hey Jeannie. Did you know the internet was created as a panopticon? </b>
 Who are you? 
 \tI was fantasising about the Library tea-room and raisin scones when that instant message popped up. At first I thought it was some creepy postgrad who’d never had a girlfriend. But my mystery correspondent laid a hook in me:
 I could say I’m from another dimension. Or that I’m right beside you. Wanna talk?
@@ -249,18 +249,18 @@ I turn to look at the wheatfields stretching before me at the side of the highwa
     const chunk = Math.min(baseChunk, PAYLOAD.length - i);
 
     // Append next slice
-    out.textContent += PAYLOAD.slice(i, i+chunk);
+    out.innerHTML += PAYLOAD.slice(i, i+chunk);
     i += chunk;
 
     // Progress UI
     const p = Math.floor((i / PAYLOAD.length) * 100);
     bar.style.setProperty('--pct', p + '%');
-    pct.textContent = p + '%';
-    if (p < 15) stat.textContent = 'NEGOTIATING…';
-    else if (p < 50) stat.textContent = 'RECEIVING PAYLOAD…';
-    else if (p < 90) stat.textContent = 'VERIFYING BLOCKS…';
-    else if (p < 100) stat.textContent = 'FINALIZING…';
-    else stat.textContent = 'COMPLETE';
+    pct.innerHTML = p + '%';
+    if (p < 15) stat.innerHTML = 'NEGOTIATING…';
+    else if (p < 50) stat.innerHTML = 'RECEIVING PAYLOAD…';
+    else if (p < 90) stat.innerHTML = 'VERIFYING BLOCKS…';
+    else if (p < 100) stat.out.innerHTML = 'FINALIZING…';
+    else stat.out.innerHTML = 'COMPLETE';
 
     // Auto-scroll
     screen.scrollTop = screen.scrollHeight;
@@ -273,7 +273,7 @@ I turn to look at the wheatfields stretching before me at the side of the highwa
       cursor.style.display = 'none';
       const end = document.createElement('div');
       end.className = 'line';
-      end.textContent = '[done] 100% • hashes verified • link closed';
+      end.innerHTML = '[done] 100% • hashes verified • link closed';
       out.parentNode.appendChild(end);
       screen.scrollTop = screen.scrollHeight;
     }
@@ -288,11 +288,11 @@ I turn to look at the wheatfields stretching before me at the side of the highwa
     if (e.key.toLowerCase() === 's' && i < PAYLOAD.length){
       // skip to end
       i = PAYLOAD.length;
-      out.textContent = PAYLOAD;
-      bar.style.setProperty('--pct','100%'); pct.textContent = '100%'; stat.textContent='COMPLETE';
+      out.innerHTML = PAYLOAD;
+      bar.style.setProperty('--pct','100%'); pct.innerHTML = '100%'; stat.innerHTML='COMPLETE';
       cursor.style.display='none';
       const end = document.createElement('div'); end.className='line';
-      end.textContent='[done] 100% • hashes verified • link closed';
+      end.innerHTML='[done] 100% • hashes verified • link closed';
       out.parentNode.appendChild(end);
       screen.scrollTop = screen.scrollHeight;
     }
