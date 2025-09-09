@@ -85,6 +85,7 @@ body.flicker-off .ch{
   transform: none !important;
   opacity: 1 !important;
 }
+.cline { white-space: pre-wrap; }
 
   </style>
 </head>
@@ -170,48 +171,65 @@ The guard nodded to himself, then began to recite the Ten Precepts. I joined him
   const page = document.getElementById('page');
 
   RAW.split(/\n\s*\n/).forEach(par => {
-    const p = document.createElement('p');
-    p.className = 'cline';
-    const lines = par.split(/\n/);
-    lines.forEach((ln, li) => {
-      for (const ch of ln){
-        const span = document.createElement('span');
-        span.className = 'ch';
-        span.textContent = ch === ' ' ? '\u00A0' : ch;
+  const p = document.createElement('p');
+  p.className = 'cline';
 
-        const r = Math.random;
-        const getVar = (name) => parseFloat(getComputedStyle(document.documentElement).getPropertyValue(name)) || 0;
+  const lines = par.split(/\n/);
 
-        const blMax = getVar('--max-blur');
-        const jig   = getVar('--max-jiggle');
+  // Read CSS vars once per paragraph (faster than per-character)
+  const rs = getComputedStyle(document.documentElement);
+  const blMax   = parseFloat(rs.getPropertyValue('--max-blur'))   || 0;
+  const jig     = parseFloat(rs.getPropertyValue('--max-jiggle')) || 0;
+  const delayMax= parseFloat(rs.getPropertyValue('--delay-max'))  || 0;
 
-        const bl1 = (r() * blMax).toFixed(2) + 'px';
-        const bl2 = (r() * blMax).toFixed(2) + 'px';
-        const bl3 = (r() * blMax).toFixed(2) + 'px';
-        const tx  = ((r()-0.5) * 2 * jig).toFixed(2) + 'px';
-        const ty  = ((r()-0.5) * 2 * jig).toFixed(2) + 'px';
-        const op1 = (0.88 + r() * 0.12).toFixed(2);
-        const op2 = (0.75 + r() * 0.20).toFixed(2);
-        const op3 = (0.82 + r() * 0.16).toFixed(2);
-        const dur = (0.9 + r() * 1.0).toFixed(2) + 's';
-        const del = (r() * parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--delay-max'))).toFixed(2) + 's';
+  lines.forEach((ln, li) => {
+    let spaceRun = '';
 
-        span.style.setProperty('--bl1', bl1);
-        span.style.setProperty('--bl2', bl2);
-        span.style.setProperty('--bl3', bl3);
-        span.style.setProperty('--tx', tx);
-        span.style.setProperty('--ty', ty);
-        span.style.setProperty('--op1', op1);
-        span.style.setProperty('--op2', op2);
-        span.style.setProperty('--op3', op3);
-        span.style.animation = `flicker ${dur} steps(2,end) infinite`;
-        span.style.animationDelay = del;
-        p.appendChild(span);
+    for (let idx = 0; idx < ln.length; idx++) {
+      const ch = ln[idx];
+
+      // Collect real whitespace as a text node (creates wrap opportunities)
+      if (ch === ' ' || ch === '\t') {
+        spaceRun += (ch === '\t' ? '    ' : ' ');
+        continue;
       }
-      if (li < lines.length - 1) p.appendChild(document.createElement('br'));
-    });
-    page.appendChild(p);
+
+      // Flush any accumulated spaces before a visible character
+      if (spaceRun) {
+        p.appendChild(document.createTextNode(spaceRun));
+        spaceRun = '';
+      }
+
+      // Visible character gets a flickery span
+      const span = document.createElement('span');
+      span.className = 'ch';
+      span.textContent = ch;
+
+      const r = Math.random;
+      span.style.setProperty('--bl1', (r() * blMax).toFixed(2) + 'px');
+      span.style.setProperty('--bl2', (r() * blMax).toFixed(2) + 'px');
+      span.style.setProperty('--bl3', (r() * blMax).toFixed(2) + 'px');
+      span.style.setProperty('--tx',  ((r()-0.5)*2*jig).toFixed(2) + 'px');
+      span.style.setProperty('--ty',  ((r()-0.5)*2*jig).toFixed(2) + 'px');
+      span.style.setProperty('--op1', (0.88 + r()*0.12).toFixed(2));
+      span.style.setProperty('--op2', (0.75 + r()*0.20).toFixed(2));
+      span.style.setProperty('--op3', (0.82 + r()*0.16).toFixed(2));
+      span.style.animation = `flicker ${(0.9 + r()*1.0).toFixed(2)}s steps(2,end) infinite`;
+      span.style.animationDelay = (r() * delayMax).toFixed(2) + 's';
+
+      p.appendChild(span);
+    }
+
+    // Flush trailing spaces at end of line
+    if (spaceRun) p.appendChild(document.createTextNode(spaceRun));
+
+    // Preserve explicit newlines
+    if (li < lines.length - 1) p.appendChild(document.createElement('br'));
   });
+
+  page.appendChild(p);
+});
+
   </script>
   <script>
     (function () {
