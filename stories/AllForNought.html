@@ -86,6 +86,7 @@ body.flicker-off .ch{
   opacity: 1 !important;
 }
 .cline { white-space: pre-wrap; }
+.word  { display: inline-block; }
 
   </style>
 </head>
@@ -169,66 +170,84 @@ The guard nodded to himself, then began to recite the Ten Precepts. I joined him
 `;
 
   const page = document.getElementById('page');
-
   RAW.split(/\n\s*\n/).forEach(par => {
   const p = document.createElement('p');
   p.className = 'cline';
 
   const lines = par.split(/\n/);
 
-  // Read CSS vars once per paragraph (faster than per-character)
+  // Read CSS vars once per paragraph
   const rs = getComputedStyle(document.documentElement);
-  const blMax   = parseFloat(rs.getPropertyValue('--max-blur'))   || 0;
-  const jig     = parseFloat(rs.getPropertyValue('--max-jiggle')) || 0;
-  const delayMax= parseFloat(rs.getPropertyValue('--delay-max'))  || 0;
+  const blMax    = parseFloat(rs.getPropertyValue('--max-blur'))   || 0;
+  const jig      = parseFloat(rs.getPropertyValue('--max-jiggle')) || 0;
+  const delayMax = parseFloat(rs.getPropertyValue('--delay-max'))  || 0;
 
   lines.forEach((ln, li) => {
-    let spaceRun = '';
+    let wordEl = null;  // current <span class="word">
+    let spaceRun = '';  // accumulate consecutive spaces/tabs
 
-    for (let idx = 0; idx < ln.length; idx++) {
-      const ch = ln[idx];
-
-      // Collect real whitespace as a text node (creates wrap opportunities)
-      if (ch === ' ' || ch === '\t') {
-        spaceRun += (ch === '\t' ? '    ' : ' ');
-        continue;
-      }
-
-      // Flush any accumulated spaces before a visible character
+    const flushSpaces = () => {
       if (spaceRun) {
         p.appendChild(document.createTextNode(spaceRun));
         spaceRun = '';
       }
+    };
+    const flushWord = () => {
+      if (wordEl) {
+        p.appendChild(wordEl);
+        wordEl = null;
+      }
+    };
 
-      // Visible character gets a flickery span
+    for (let idx = 0; idx < ln.length; idx++) {
+      const ch = ln[idx];
+
+      // Spaces/tabs become real whitespace (wrap points)
+      if (ch === ' ' || ch === '\t') {
+        flushWord();
+        spaceRun += (ch === '\t' ? '    ' : ' ');
+        continue;
+      }
+
+      // Before a visible char, emit any pending spaces
+      flushSpaces();
+
+      // Start a new word wrapper if needed
+      if (!wordEl) {
+        wordEl = document.createElement('span');
+        wordEl.className = 'word';
+      }
+
+      // Per-letter flicker span
       const span = document.createElement('span');
       span.className = 'ch';
       span.textContent = ch;
 
       const r = Math.random;
-      span.style.setProperty('--bl1', (r() * blMax).toFixed(2) + 'px');
-      span.style.setProperty('--bl2', (r() * blMax).toFixed(2) + 'px');
-      span.style.setProperty('--bl3', (r() * blMax).toFixed(2) + 'px');
+      span.style.setProperty('--bl1', (r()*blMax).toFixed(2) + 'px');
+      span.style.setProperty('--bl2', (r()*blMax).toFixed(2) + 'px');
+      span.style.setProperty('--bl3', (r()*blMax).toFixed(2) + 'px');
       span.style.setProperty('--tx',  ((r()-0.5)*2*jig).toFixed(2) + 'px');
       span.style.setProperty('--ty',  ((r()-0.5)*2*jig).toFixed(2) + 'px');
       span.style.setProperty('--op1', (0.88 + r()*0.12).toFixed(2));
       span.style.setProperty('--op2', (0.75 + r()*0.20).toFixed(2));
       span.style.setProperty('--op3', (0.82 + r()*0.16).toFixed(2));
       span.style.animation = `flicker ${(0.9 + r()*1.0).toFixed(2)}s steps(2,end) infinite`;
-      span.style.animationDelay = (r() * delayMax).toFixed(2) + 's';
+      span.style.animationDelay = (r()*delayMax).toFixed(2) + 's';
 
-      p.appendChild(span);
+      wordEl.appendChild(span);
     }
 
-    // Flush trailing spaces at end of line
-    if (spaceRun) p.appendChild(document.createTextNode(spaceRun));
+    // Flush any trailing spaces/word at end of line
+    flushSpaces();
+    flushWord();
 
-    // Preserve explicit newlines
     if (li < lines.length - 1) p.appendChild(document.createElement('br'));
   });
 
   page.appendChild(p);
 });
+
 
   </script>
   <script>
