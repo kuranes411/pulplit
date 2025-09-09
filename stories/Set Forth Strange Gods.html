@@ -239,48 +239,97 @@ const out = document.getElementById('out');
   const stat = document.getElementById('stat');
   const cursor = document.getElementById('cur');
 
-  let i = 0;
+  let pos = 0;           // position in PAYLOAD
   let fast = false;
+  const len = PAYLOAD.length;
 
-  function nextChunk() {
-    if (i >= PAYLOAD.length) return '';
-    const base = fast ? 60 : 10 + Math.floor(Math.random()*8);
-    let j = Math.min(i + base, PAYLOAD.length);
+  // Stack of current parent nodes; start with the output container.
+  const stack = [out];
 
-    // If we’d be cutting in the middle of a tag, extend to the next '>'
-    const lastLt = PAYLOAD.lastIndexOf('<', j);
-    const lastGt = PAYLOAD.lastIndexOf('>', j);
-    if (lastLt > -1 && lastLt > lastGt) {
-      const close = PAYLOAD.indexOf('>', j);
-      j = close === -1 ? PAYLOAD.length : close + 1;
-    }
+  function top() { return stack[stack.length - 1]; }
 
-    const chunk = PAYLOAD.slice(i, j);
-    i = j;
-    return chunk;
+  function appendText(s) {
+    if (!s) return;
+    top().appendChild(document.createTextNode(s));
   }
 
-  function tick(){
-    const chunk = nextChunk();
+  function openTag(name) {
+    const el = document.createElement(name);
+    top().appendChild(el);
+    stack.push(el);
+  }
 
-    // Append without reparsing the whole string each time
-    out.insertAdjacentHTML('beforeend', chunk);
+  function closeTag(name) {
+    // Pop until we close the requested tag (be tolerant of mismatches)
+    for (let i = stack.length - 1; i > 0; i--) {
+      if (stack[i].tagName && stack[i].tagName.toLowerCase() === name) {
+        stack.splice(i, 1);
+        return;
+      }
+    }
+  }
 
-    const p = Math.floor((i / PAYLOAD.length) * 100);
+  function processChunk(budgetChars) {
+    let used = 0;
+    while (pos < len && used < budgetChars) {
+      const ch = PAYLOAD[pos];
+
+      if (ch === '<') {
+        // Parse a tag token safely
+        const gt = PAYLOAD.indexOf('>', pos);
+        if (gt === -1) { // malformed -> treat rest as text
+          appendText(PAYLOAD.slice(pos));
+          used += len - pos;
+          pos = len;
+          break;
+        }
+        const tag = PAYLOAD.slice(pos, gt + 1).toLowerCase();
+        pos = gt + 1;
+
+        if (tag === '<b>') openTag('b');
+        else if (tag === '</b>') closeTag('b');
+        else if (tag === '<i>') openTag('i');
+        else if (tag === '</i>') closeTag('i');
+        else {
+          // Any other tag? Just render it as literal text
+          appendText(tag);
+          used += tag.length;
+        }
+      } else {
+        // Text until next '<' or until we consume the budget
+        const nextLt = PAYLOAD.indexOf('<', pos);
+        const end = nextLt === -1 ? len : nextLt;
+        const sliceEnd = Math.min(end, pos + (budgetChars - used));
+        const chunk = PAYLOAD.slice(pos, sliceEnd);
+        appendText(chunk);
+        used += chunk.length;
+        pos = sliceEnd;
+      }
+    }
+  }
+
+  function updateProgress() {
+    const p = Math.floor((pos / len) * 100);
     bar.style.setProperty('--pct', p + '%');
     pct.textContent = p + '%';
-    if (p < 15)      stat.textContent = 'NEGOTIATING…';
-    else if (p < 50) stat.textContent = 'RECEIVING PAYLOAD…';
-    else if (p < 90) stat.textContent = 'VERIFYING BLOCKS…';
-    else if (p < 100)stat.textContent = 'FINALIZING…';
-    else             stat.textContent = 'COMPLETE';
+    if (p < 15)       stat.textContent = 'NEGOTIATING…';
+    else if (p < 50)  stat.textContent = 'RECEIVING PAYLOAD…';
+    else if (p < 90)  stat.textContent = 'VERIFYING BLOCKS…';
+    else if (p < 100) stat.textContent = 'FINALIZING…';
+    else              stat.textContent = 'COMPLETE';
+  }
+
+  function tick() {
+    const base = fast ? 80 : 20 + Math.floor(Math.random() * 12);
+    processChunk(base);
+    updateProgress();
 
     screen.scrollTop = screen.scrollHeight;
 
-    if (i < PAYLOAD.length){
+    if (pos < len) {
       const baseDelay = fast ? 6 : 26;
       const jitter = fast ? 4 : 60;
-      setTimeout(tick, baseDelay + Math.random()*jitter);
+      setTimeout(tick, baseDelay + Math.random() * jitter);
     } else {
       cursor.style.display = 'none';
       const end = document.createElement('div');
@@ -291,20 +340,24 @@ const out = document.getElementById('out');
     }
   }
 
+  // Start
   setTimeout(tick, 400);
 
+  // Interactions
   document.addEventListener('click', () => { fast = !fast; });
+
   document.addEventListener('keydown', (e) => {
-    if (e.key.toLowerCase() === 's' && i < PAYLOAD.length){
-      i = PAYLOAD.length;
-      out.innerHTML = PAYLOAD;
-      bar.style.setProperty('--pct','100%');
+    if (e.key.toLowerCase() === 's' && pos < len) {
+      // Flush remainder in one pass
+      processChunk(Number.MAX_SAFE_INTEGER);
+      updateProgress();
+      bar.style.setProperty('--pct', '100%');
       pct.textContent = '100%';
       stat.textContent = 'COMPLETE';
-      cursor.style.display='none';
+      cursor.style.display = 'none';
       const end = document.createElement('div');
-      end.className='line';
-      end.innerHTML='[done] 100% • hashes verified • link closed';
+      end.className = 'line';
+      end.innerHTML = '[done] 100% • hashes verified • link closed';
       out.parentNode.appendChild(end);
       screen.scrollTop = screen.scrollHeight;
     }
