@@ -239,77 +239,40 @@ const out = document.getElementById('out');
   const stat = document.getElementById('stat');
   const cursor = document.getElementById('cur');
 
-  let pos = 0;           // position in PAYLOAD
-  let fast = false;
-  const len = PAYLOAD.length;
+  let i = 0;              // index into PAYLOAD
+  let fast = false;       // speed toggle
+  let emitted = 0;        // visible chars emitted (for progress)
+  const TOTAL_TEXT = PAYLOAD.replace(/<\/?i>|<\/?b>/gi,'').length;
 
-  // Stack of current parent nodes; start with the output container.
-  const stack = [out];
+  let bold = false, italic = false;
+  let span = makeSpan();
 
-  function top() { return stack[stack.length - 1]; }
-
-  function appendText(s) {
-    if (!s) return;
-    top().appendChild(document.createTextNode(s));
+  function makeSpan(){
+    const s = document.createElement('span');
+    if (bold)  s.style.fontWeight = '700';
+    if (italic) s.style.fontStyle  = 'italic';
+    out.appendChild(s);
+    return s;
   }
 
-  function openTag(name) {
-    const el = document.createElement(name);
-    top().appendChild(el);
-    stack.push(el);
-  }
-
-  function closeTag(name) {
-    // Pop until we close the requested tag (be tolerant of mismatches)
-    for (let i = stack.length - 1; i > 0; i--) {
-      if (stack[i].tagName && stack[i].tagName.toLowerCase() === name) {
-        stack.splice(i, 1);
-        return;
-      }
-    }
-  }
-
-  function processChunk(budgetChars) {
+  function processChars(budget){
     let used = 0;
-    while (pos < len && used < budgetChars) {
-      const ch = PAYLOAD[pos];
+    while (i < PAYLOAD.length && used < budget){
+      // Handle our 4 tags; everything else is literal text
+      if (PAYLOAD.startsWith('<b>', i))     { i += 3; if (!bold)   { bold = true;  span = makeSpan(); } continue; }
+      if (PAYLOAD.startsWith('</b>', i))    { i += 4; if (bold)    { bold = false; span = makeSpan(); } continue; }
+      if (PAYLOAD.startsWith('<i>', i))     { i += 3; if (!italic) { italic = true; span = makeSpan(); } continue; }
+      if (PAYLOAD.startsWith('</i>', i))    { i += 4; if (italic)  { italic = false;span = makeSpan(); } continue; }
 
-      if (ch === '<') {
-        // Parse a tag token safely
-        const gt = PAYLOAD.indexOf('>', pos);
-        if (gt === -1) { // malformed -> treat rest as text
-          appendText(PAYLOAD.slice(pos));
-          used += len - pos;
-          pos = len;
-          break;
-        }
-        const tag = PAYLOAD.slice(pos, gt + 1).toLowerCase();
-        pos = gt + 1;
-
-        if (tag === '<b>') openTag('b');
-        else if (tag === '</b>') closeTag('b');
-        else if (tag === '<i>') openTag('i');
-        else if (tag === '</i>') closeTag('i');
-        else {
-          // Any other tag? Just render it as literal text
-          appendText(tag);
-          used += tag.length;
-        }
-      } else {
-        // Text until next '<' or until we consume the budget
-        const nextLt = PAYLOAD.indexOf('<', pos);
-        const end = nextLt === -1 ? len : nextLt;
-        const sliceEnd = Math.min(end, pos + (budgetChars - used));
-        const chunk = PAYLOAD.slice(pos, sliceEnd);
-        appendText(chunk);
-        used += chunk.length;
-        pos = sliceEnd;
-      }
+      // Default: stream one visible character
+      const ch = PAYLOAD[i++];
+      span.appendChild(document.createTextNode(ch));
+      emitted++; used++;
     }
   }
 
-  function updateProgress() {
-    const p = Math.floor((pos / len) * 100);
+  function updateUI(){
+    const p = Math.min(100, Math.floor((emitted / TOTAL_TEXT) * 100));
     bar.style.setProperty('--pct', p + '%');
     pct.textContent = p + '%';
     if (p < 15)       stat.textContent = 'NEGOTIATING…';
@@ -319,17 +282,16 @@ const out = document.getElementById('out');
     else              stat.textContent = 'COMPLETE';
   }
 
-  function tick() {
-    const base = fast ? 80 : 20 + Math.floor(Math.random() * 12);
-    processChunk(base);
-    updateProgress();
-
+  function tick(){
+    const base = fast ? 80 : 20 + Math.floor(Math.random()*12);
+    processChars(base);
+    updateUI();
     screen.scrollTop = screen.scrollHeight;
 
-    if (pos < len) {
+    if (i < PAYLOAD.length){
       const baseDelay = fast ? 6 : 26;
       const jitter = fast ? 4 : 60;
-      setTimeout(tick, baseDelay + Math.random() * jitter);
+      setTimeout(tick, baseDelay + Math.random()*jitter);
     } else {
       cursor.style.display = 'none';
       const end = document.createElement('div');
@@ -340,24 +302,20 @@ const out = document.getElementById('out');
     }
   }
 
-  // Start
   setTimeout(tick, 400);
 
   // Interactions
   document.addEventListener('click', () => { fast = !fast; });
-
   document.addEventListener('keydown', (e) => {
-    if (e.key.toLowerCase() === 's' && pos < len) {
-      // Flush remainder in one pass
-      processChunk(Number.MAX_SAFE_INTEGER);
-      updateProgress();
-      bar.style.setProperty('--pct', '100%');
+    if (e.key.toLowerCase() === 's' && i < PAYLOAD.length){
+      processChars(Number.MAX_SAFE_INTEGER); // flush
+      updateUI();
+      bar.style.setProperty('--pct','100%');
       pct.textContent = '100%';
       stat.textContent = 'COMPLETE';
-      cursor.style.display = 'none';
-      const end = document.createElement('div');
-      end.className = 'line';
-      end.innerHTML = '[done] 100% • hashes verified • link closed';
+      cursor.style.display='none';
+      const end = document.createElement('div'); end.className='line';
+      end.innerHTML='[done] 100% • hashes verified • link closed';
       out.parentNode.appendChild(end);
       screen.scrollTop = screen.scrollHeight;
     }
