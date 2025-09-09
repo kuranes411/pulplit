@@ -232,7 +232,7 @@ I don’t know if the Police came looking for me that night, or if they’re loo
 However, I do know what’s in those documents, and why Forrest wanted them to be rescued. Can I tell you? Probably. But only in person, and only if we’re not being watched – no easy situation these days. To sum up, let’s just say everything you know is wrong. Everything. One day I’ll tell everyone – then they’ll kill me. But I’m not ready to die. Not yet, not while I live here, away from them, their lies and their technocratic control.
 I turn to look at the wheatfields stretching before me at the side of the highway. A hawk opens its wings above that golden sea. Free. Free at last. `;
 
-  const out = document.getElementById('out');
+const out = document.getElementById('out');
   const screen = document.getElementById('screen');
   const bar = document.getElementById('bar');
   const pct = document.getElementById('pct');
@@ -242,27 +242,39 @@ I turn to look at the wheatfields stretching before me at the side of the highwa
   let i = 0;
   let fast = false;
 
-  // streaming loop
+  function nextChunk() {
+    if (i >= PAYLOAD.length) return '';
+    const base = fast ? 60 : 10 + Math.floor(Math.random()*8);
+    let j = Math.min(i + base, PAYLOAD.length);
+
+    // If we’d be cutting in the middle of a tag, extend to the next '>'
+    const lastLt = PAYLOAD.lastIndexOf('<', j);
+    const lastGt = PAYLOAD.lastIndexOf('>', j);
+    if (lastLt > -1 && lastLt > lastGt) {
+      const close = PAYLOAD.indexOf('>', j);
+      j = close === -1 ? PAYLOAD.length : close + 1;
+    }
+
+    const chunk = PAYLOAD.slice(i, j);
+    i = j;
+    return chunk;
+  }
+
   function tick(){
-    // Chunk size & delay emulate variable network throughput
-    const baseChunk = fast ? 60 : 10 + Math.floor(Math.random()*8);
-    const chunk = Math.min(baseChunk, PAYLOAD.length - i);
+    const chunk = nextChunk();
 
-    // Append next slice
-    out.innerHTML += PAYLOAD.slice(i, i+chunk);
-    i += chunk;
+    // Append without reparsing the whole string each time
+    out.insertAdjacentHTML('beforeend', chunk);
 
-    // Progress UI
     const p = Math.floor((i / PAYLOAD.length) * 100);
     bar.style.setProperty('--pct', p + '%');
-    pct.innerHTML = p + '%';
-    if (p < 15) stat.innerHTML = 'NEGOTIATING…';
-    else if (p < 50) stat.innerHTML = 'RECEIVING PAYLOAD…';
-    else if (p < 90) stat.innerHTML = 'VERIFYING BLOCKS…';
-    else if (p < 100) stat.out.innerHTML = 'FINALIZING…';
-    else stat.out.innerHTML = 'COMPLETE';
+    pct.textContent = p + '%';
+    if (p < 15)      stat.textContent = 'NEGOTIATING…';
+    else if (p < 50) stat.textContent = 'RECEIVING PAYLOAD…';
+    else if (p < 90) stat.textContent = 'VERIFYING BLOCKS…';
+    else if (p < 100)stat.textContent = 'FINALIZING…';
+    else             stat.textContent = 'COMPLETE';
 
-    // Auto-scroll
     screen.scrollTop = screen.scrollHeight;
 
     if (i < PAYLOAD.length){
@@ -279,19 +291,19 @@ I turn to look at the wheatfields stretching before me at the side of the highwa
     }
   }
 
-  // Start after a tiny pause
   setTimeout(tick, 400);
 
-  // Interactions
   document.addEventListener('click', () => { fast = !fast; });
   document.addEventListener('keydown', (e) => {
     if (e.key.toLowerCase() === 's' && i < PAYLOAD.length){
-      // skip to end
       i = PAYLOAD.length;
       out.innerHTML = PAYLOAD;
-      bar.style.setProperty('--pct','100%'); pct.innerHTML = '100%'; stat.innerHTML='COMPLETE';
+      bar.style.setProperty('--pct','100%');
+      pct.textContent = '100%';
+      stat.textContent = 'COMPLETE';
       cursor.style.display='none';
-      const end = document.createElement('div'); end.className='line';
+      const end = document.createElement('div');
+      end.className='line';
       end.innerHTML='[done] 100% • hashes verified • link closed';
       out.parentNode.appendChild(end);
       screen.scrollTop = screen.scrollHeight;
